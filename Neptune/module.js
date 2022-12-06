@@ -106,8 +106,13 @@ class Percentile{
         }
         console.log(this.percentileObject)
     }
-    findPercentileOf(value){
-
+    findPercentileOf(val, name){
+        for(let i=0; i<this.percentileObjectSorted[name].length; i++){
+            if(this.percentileObjectSorted[name][i] > val){
+                console.log(i/this.percentileObjectSorted[name].length);
+                return;
+            }
+        }
     }
     addNewMatchToPercentile(snapshot){
 
