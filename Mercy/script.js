@@ -1,20 +1,9 @@
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAO1aIe_fTZB6duj8YIRyYcLTINlcP196w",
-  authDomain: "escouting-7b4e0.firebaseapp.com",
-  databaseURL: "https://escouting-7b4e0-default-rtdb.firebaseio.com",
-  projectId: "escouting-7b4e0",
-  storageBucket: "escouting-7b4e0.appspot.com",
-  messagingSenderId: "377179821867",
-  appId: "1:377179821867:web:cedab35ab708c12986976e",
-  measurementId: "G-8VWYRF9QY6"
-};
-
-const app = initializeApp(firebaseConfig);
-const database = to(app);
+const mercy_Encoder = new Encoder();
+const mercy_DataStructure = new DataStructure();
+const db = mercy_DataStructure.getFireBase();
 console.log("success")
 
-const db = to();
 function uploadData() {
   document.getElementById("status").innerHTML = "";
   var all_data = document.getElementById("input").value;
@@ -51,41 +40,20 @@ function uploadData() {
   for(var i=0;i<sorted_data.length;i++){
       try{
           var data = sorted_data[i];
-          //data[0] = robot number, data[1] = match number
-          var json_data = 
-          { 
-            "Match Number": data[1],
-            "Team": data[0],
-            "Scout Name": data[2],
-            "Alliance Color": data[3],
-            "Taxi": data[4],
-            "Auto High": data[5],
-            "Auto Low": data[6],
-            "Auto Missed": data[7],
-            "Tele High": data[8],
-            "Tele Low": data[9],
-            "Tele Missed": data[10],
-            "Attempted Climb": data[11],
-            "Climb Level": data[12],
-            "Climb Time": data[13],
-            "Defence Time": data[14],
-            "Penalty": data[15],
-            "Yeet": data[16],
-            "Oof": data[17],
-            "QATA": data[18],
-            "Drivetrain Type": data[19],
-            "Shooter Type": data[20]
-          };
+          
+          formattedData = mercy_Encoder.rawDataToFormattedData(data, mercy_DataStructure.dataLabels);
 
-          cr(or(sr(db, 'Events/BB2022/Robots/' + data[0] + '/'), data[1]), json_data)
+          set(child(ref(db, 'Events/BB2022/Robots/' + data[0] + '/'), data[1]), formattedData)
 
-            hr(sr(db, 'Events/BB2022/Matches/' + data[1] + "-" + data[3] + "/"), json_data)
+          remove(ref(db, 'Events/BB2022/Matches/' + data[1] + "-" + data[3] + "/"), formattedData)
 
-          cr(or(sr(db, `Events/BB2022/Matches/`), (data[1] + "-" + data[3])),json_data)
+          set(child(ref(db, `Events/BB2022/Matches/`), (data[1] + "-" + data[3])),formattedData)
+          
           document.getElementById("status").innerHTML += "Successful Upload for " + data[1] + "-" + data[3] + "<br>" ;
       }
       catch(err){
         document.getElementById("status").innerHTML += "Failed Upload for "+ data[1] + "-" + data[3] + ": " + err.message + "<br>";
+        console.log(err)
         }
  
     }
