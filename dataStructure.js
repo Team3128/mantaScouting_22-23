@@ -23,7 +23,7 @@ class DataStructure {
         this.ptValues = [3, 4, 2, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0]
         this.pitscoutLabels = ["Timestamp", "Team Number", "Pitscout Name", "Drivetrain Type", "Robot Weight", "Number of DT Motors", "Motor Type", "Vision", "Auto", "Endgame", "Aluminum Assistance", "Miscellaneous"];
 
-        this.firebasePath = "Events/BB2022";
+        this.firebasePath = "Events/BB2022/";
         this.firebaseConfig = {
             apiKey: "AIzaSyAO1aIe_fTZB6duj8YIRyYcLTINlcP196w",
             authDomain: "escouting-7b4e0.firebaseapp.com",
@@ -64,7 +64,7 @@ class DataStructure {
         return this.pitscoutLabels[i];
     }
     getPath(type) {
-        return firebasePath + type;
+        return this.firebasePath + type + "/";
     }
 
     setDataValues(arr) {
@@ -80,7 +80,7 @@ class DataStructure {
 
     getFireBase(){
         this.app = initializeApp(this.firebaseConfig);
-        this.database = to(this.app);
+        this.database = getDatabase(this.app);
         return this.database;
     }
 

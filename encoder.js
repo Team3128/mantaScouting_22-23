@@ -12,5 +12,24 @@ class Encoder{
         return this.formattedJsonData;
     }
 
+    uploadFormattedData(database, data, dataStructure){
+        try{
+            let setPath = dataStructure.getPath("Robots");
+            set(child(ref(database, setPath + data["Team"] + '/'), data["Match"]), data)
+            
+            setPath = dataStructure.getPath("Matches");
+            remove(ref(database, setPath + data["Match"] + "-" + data["Position"] + "/"), data)
+  
+            setPath = dataStructure.getPath("Matches");
+            set(child(ref(database, setPath), (data["Match"] + "-" + data["Position"])), data)
+            
+            return true;
+        }
+        catch(err){
+          return err.message;
+          }
+
+    }
+
 
 }

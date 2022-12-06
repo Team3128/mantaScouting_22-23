@@ -1,7 +1,7 @@
 
-const mercy_Encoder = new Encoder();
-const mercy_DataStructure = new DataStructure();
-const db = mercy_DataStructure.getFireBase();
+const encoder = new Encoder();
+const dataStructure = new DataStructure();
+const db = dataStructure.getFireBase();
 console.log("success")
 
 function uploadData() {
@@ -21,14 +21,14 @@ function uploadData() {
     }
     var data = sep_data[i].split(',');
       //data[0] = robot number, data[1] = match number
-      if(data[1].length !=2){
-        data[1] = "0" + data[1];
+      if(data[0].length !=2){
+        data[0] = "0" + data[0];
       }
-      if(sort_dict.hasOwnProperty(data[1] + data[3])){
+      if(sort_dict.hasOwnProperty(data[0] + data[2])){
         continue
       }else{
-        sort_dict[data[1] + data[3]] = data
-        sort_arr.push(data[1] + data[3])
+        sort_dict[data[0] + data[2]] = data
+        sort_arr.push(data[0] + data[2])
       }
   }
 
@@ -38,23 +38,20 @@ function uploadData() {
   }
   
   for(var i=0;i<sorted_data.length;i++){
-      try{
           var data = sorted_data[i];
           
-          formattedData = mercy_Encoder.rawDataToFormattedData(data, mercy_DataStructure.dataLabels);
+          formattedData = encoder.rawDataToFormattedData(data, dataStructure.dataLabels);
 
-          set(child(ref(db, 'Events/BB2022/Robots/' + data[0] + '/'), data[1]), formattedData)
+          uploadStatus = encoder.uploadFormattedData(db, formattedData, dataStructure)
 
-          remove(ref(db, 'Events/BB2022/Matches/' + data[1] + "-" + data[3] + "/"), formattedData)
-
-          set(child(ref(db, `Events/BB2022/Matches/`), (data[1] + "-" + data[3])),formattedData)
+          if(uploadStatus == true){
+            document.getElementById("status").innerHTML += "Successful Upload for " + formattedData["Match"] + "-" + formattedData["Position"] + "<br>" ;
+          }
+          else{
+            document.getElementById("status").innerHTML += "Failed Upload for "+ formattedData["Match"] + "-" + formattedData["Position"] + ": " + uploadStatus + "<br>";
+            console.log(uploadStatus)
+          }
           
-          document.getElementById("status").innerHTML += "Successful Upload for " + data[1] + "-" + data[3] + "<br>" ;
-      }
-      catch(err){
-        document.getElementById("status").innerHTML += "Failed Upload for "+ data[1] + "-" + data[3] + ": " + err.message + "<br>";
-        console.log(err)
-        }
  
     }
   }
