@@ -405,7 +405,7 @@ console.log("success")
 
   //HOME TAB
   //picks up the match, both new or changed match, does not update if the data is deleted from the db, have to refresh
-  vr(sr(db, 'Events/BB2022/Matches/'), (snapshot)=>{
+  onChildAdded(ref(db, 'Events/BB2022/Matches/'), (snapshot)=>{
     const data = snapshot.val()
     
         //if the match data is of a new match, meaning that if it is match 3 and has not other data
