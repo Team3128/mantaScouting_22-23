@@ -12,15 +12,18 @@ console.log("success")
   var searchState = true;
 //gathers all the data under the path, not sure what it returns if path does not exist yet
      function load(){
-       pr(sr(db, "Events/BB2022/Robots")).then((snapshot) => {
+      let setPath = dataStructure.getPath("Robots");
+       get(ref(db, setPath)).then((snapshot) => {
         robotData = snapshot.val()
         console.log(robotData)
       })
-       pr(sr(db, "Events/BB2022/Pitscout")).then((snapshot) => {
+      setPath = dataStructure.getPath("Pitscout");
+       get(ref(db, setPath)).then((snapshot) => {
         robot_pitData = snapshot.val()
         console.log(robot_pitData)
       })
-       pr(sr(db, "Events/BB2022/Image")).then((snapshot) => {
+      setPath = dataStructure.getPath("Image");
+       get(ref(db, setPath)).then((snapshot) => {
         robot_imgData = snapshot.val()
         console.log(robot_imgData)
       })
@@ -313,29 +316,6 @@ console.log("success")
   //HOME TAB AND RANK TAB
   //
 
-  //table head names for the home tab
-  var headNames = [
-    "ZMatch Number",
-    "ZTeam",
-    "Scout Name",
-    "Alliance Color",
-    "Taxi",
-    "Auto High",
-    "Auto Low",
-    "Auto Missed",
-    "Tele High",
-    "Tele Low",
-    "Tele Missed",
-    "Attempted Climb",
-    "Climb Level",
-    "Climb Time",
-    "Defence Time",
-    "Penalty",
-    "Yeet",
-    "Oof",
-    "Drivetrain Type",
-    "Shooter Type"
-  ];
   //table head names for the rank tab
   var rank_HeadNames = [
     "Rank",
@@ -405,7 +385,9 @@ console.log("success")
 
   //HOME TAB
   //picks up the match, both new or changed match, does not update if the data is deleted from the db, have to refresh
-  onChildAdded(ref(db, 'Events/BB2022/Matches/'), (snapshot)=>{
+  var homeHeadNames = dataStructure.getDataLabels();
+  let setPath = dataStructure.getPath("Matches");
+  onChildAdded(ref(db, setPath), (snapshot)=>{
     const data = snapshot.val()
     
         //if the match data is of a new match, meaning that if it is match 3 and has not other data
@@ -449,7 +431,6 @@ console.log("success")
         //that wants to be replaced, creates a new row, then does .replaceChild to replace it, then changes the
         //row in static tracker to the new row
        var insert_val = static_tracker[data["ZMatch Number"]][data["Alliance Color"]]
-        const row = document.createElement("tr")
         for(var g=0;g<headNames.length;g++){
           let color = data["Alliance Color"][0]
           const cellText = document.createElement("div");
@@ -474,7 +455,7 @@ console.log("success")
   //updates everytime a robot gets a new match
   //code runs over every robot due to trash firebase api and its ability to grab the data desired well
   //so everytime there is a new match, it kind of has to calculate everything again and have to redisplay all the data
-  yr(sr(db, 'Events/BB2022/Robots/'), (snapshot)=>{
+  onValue(ref(db, 'Events/BB2022/Robots/'), (snapshot)=>{
     const over = snapshot.val()
     var objNames = Object.keys(over)
     var sort_arr = [];
@@ -603,7 +584,7 @@ console.log("success")
 
 
   //percentile work
-  yr(sr(db, 'Events/BB2022/Robots/'), (data)=>{
+  onValue(ref(db, 'Events/BB2022/Robots/'), (data)=>{
     data = data.val()
 
     let percentile = new Percentile(data);
