@@ -84,4 +84,12 @@ class DataStructure {
         return this.database;
     }
 
+    createDataLabels(excludedLabels, generalDataLabels){
+        for(var i=0; i<excludedLabels.length; i++){
+            var index = generalDataLabels.indexOf(excludedLabels[i]);
+            generalDataLabels.splice(index, 1);
+        }
+        return generalDataLabels;
+    }
+
 }

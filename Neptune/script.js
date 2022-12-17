@@ -359,33 +359,18 @@ console.log("success")
     document.getElementById("rank-container").appendChild(ranktbl);
   }
 
-  //general table generation
-  let tbl = document.createElement("table");
-  let thead = document.createElement("thead")
-  tbl.appendChild(thead)
-  let tblBody = document.createElement("tbody");
-  let headRow = document.createElement("tr")
-  thead.appendChild(headRow)
-  tbl.appendChild(tblBody);
-  //creating the table labels
-  function table_tableHead(){
-    for(var b =0; b<headNames.length; b++){
-      const headCell = document.createElement("th");
-      headRow.appendChild(headCell);
-      headCell.classList.add("headCell")
-      headCell.setAttribute("id", `head_cell_${b}`)
-      if(headNames[b] == "ZTeam" || headNames[b] == "ZMatch Number" ){
-        headCell.innerHTML = headNames[b].substring(1)
-      }else{
-        headCell.innerHTML = headNames[b]
-      }
-    }
-    document.getElementById("table-container").appendChild(tbl);
-  }
 
   //HOME TAB
   //picks up the match, both new or changed match, does not update if the data is deleted from the db, have to refresh
-  var homeHeadNames = dataStructure.getDataLabels();
+  var homeHeadNames = dataStructure.createDataLabels(["QATA"], dataStructure.getDataLabels());
+  //general table generation
+  const homeTable = new AddTable();
+  homeTable.addHeader(homeHeadNames);
+  var homeTableBody = homeTable.getTableBody();
+  document.getElementById("table-container").appendChild(homeTable.getTable());
+  //creating the table labels
+  
+  
   let setPath = dataStructure.getPath("Matches");
   onChildAdded(ref(db, setPath), (snapshot)=>{
     const data = snapshot.val()
@@ -395,21 +380,21 @@ console.log("success")
         //also create a place holder in the static_tracker (bad name)
         //this allows it to be replaced easily by incoming data
         //however, if the match data jumps it will not show up in order, will have to refresh to put in back in order
-        if(!static_tracker.hasOwnProperty(data["ZMatch Number"])){
+        if(!static_tracker.hasOwnProperty(data["Match"])){
           var temp_obj = {}
           for(var i=0; i<6; i++){
             const row = document.createElement("tr");
             temp_obj[color_tracker[i]] = row
-            for(var g=0;g<headNames.length;g++){
+            for(var g=0;g<homeHeadNames.length;g++){
 
               const cellText = document.createElement("div");
               const cell = document.createElement("td");
 
-              if(headNames[g] == "Alliance Color"){
+              if(homeHeadNames[g] == "Position"){
                 cellText.innerHTML = color_tracker[i]
               }
-              else if(headNames[g] == "ZMatch Number"){
-                cellText.innerHTML = data["ZMatch Number"]
+              else if(homeHeadNames[g] == "Match"){
+                cellText.innerHTML = data["Match"]
               }
               else{
                 cellText.innerHTML = "NA";
@@ -417,38 +402,23 @@ console.log("success")
               
               row.appendChild(cell);
               cell.appendChild(cellText);
-              tblBody.appendChild(row);
+              homeTableBody.appendChild(row);
               //console.log(data[color[i]][j+1][headNames[g]])
     
     
             }
           }
-          static_tracker[data["ZMatch Number"]] = temp_obj;
+          static_tracker[data["Match"]] = temp_obj;
         }
         //replace the place holder data, or if data already exists in that slot, replace the previous data
         //this system allows for it to replace the data irt without having to reload
         //does this buy calling the reference(? not sure what is exactly called) in static tracker to the row
         //that wants to be replaced, creates a new row, then does .replaceChild to replace it, then changes the
         //row in static tracker to the new row
-       var insert_val = static_tracker[data["ZMatch Number"]][data["Alliance Color"]]
-        for(var g=0;g<headNames.length;g++){
-          let color = data["Alliance Color"][0]
-          const cellText = document.createElement("div");
-          const pushinP = document.createElement("p");
-          const cell = document.createElement("td");
-
-          pushinP.innerHTML = data[headNames[g]];
-
-          row.appendChild(cell);
-          cell.appendChild(cellText);
-          cellText.appendChild(pushinP);
-          //console.log(data[color[i]][j+1][headNames[g]])
-          
-          row.style.backgroundColor = "var(--" + color + ")"
-          row.style.color = "var(--text-color)"
-        }
-        tblBody.replaceChild(row, insert_val)
-        static_tracker[data["ZMatch Number"]][data["Alliance Color"]] = row
+       var insert_val = static_tracker[data["Match"]][data["Position"]]
+        var row = homeTable.addRow(homeHeadNames, data)
+        homeTableBody.replaceChild(row, insert_val)
+        static_tracker[data["Match"]][data["position"]] = row
   }
   )
   //RANKING TAB
@@ -584,10 +554,10 @@ console.log("success")
 
 
   //percentile work
-  onValue(ref(db, 'Events/BB2022/Robots/'), (data)=>{
+  /*onValue(ref(db, 'Events/BB2022/Robots/'), (data)=>{
     data = data.val()
 
     let percentile = new Percentile(data);
     percentile.convertRawToObject().processObjectData()
     
-  })
+  })*/
