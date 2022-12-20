@@ -20,6 +20,7 @@ class DataStructure {
             "Penalty",
             "Oof Time"
         ]
+        this.wghtValues = [1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0];
         this.ptValues = [3, 4, 2, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0]
         this.pitscoutLabels = ["Timestamp", "Team Number", "Pitscout Name", "Drivetrain Type", "Robot Weight", "Number of DT Motors", "Motor Type", "Vision", "Auto", "Endgame", "Aluminum Assistance", "Miscellaneous"];
 
@@ -73,6 +74,12 @@ class DataStructure {
     setDataValues(i, val) {
         this.dataValues[i] = val;
     }
+    getWghtValues() {
+        return this.wghtValues;
+    }
+    getPtValues() {
+        return this.ptValues;
+    }
 
     validateValues() {
 
@@ -84,12 +91,12 @@ class DataStructure {
         return this.database;
     }
 
-    createDataLabels(excludedLabels, generalDataLabels){
-        for(var i=0; i<excludedLabels.length; i++){
-            var index = generalDataLabels.indexOf(excludedLabels[i]);
-            generalDataLabels.splice(index, 1);
+    createDataLabels(...givenLabels){
+        this.lableArray = [];
+        for(var i =0; i<givenLabels.length;i++){
+            this.lableArray.push(givenLabels[i])
         }
-        return generalDataLabels;
+        return this.lableArray;
     }
 
 }

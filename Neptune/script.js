@@ -317,59 +317,22 @@ console.log("success")
   //
 
   //table head names for the rank tab
-  var rank_HeadNames = [
-    "Rank",
-    "Team",
-    "Score",
-    "Taxi",
-    "Auto High",
-    "Auto Low",
-    "Auto Missed",
-    "Tele High",
-    "Tele Low",
-    "Tele Missed",
-    "Attempted Climb",
-    "Climb Level",
-    "Climb Time",
-    "Defence Time",
-    "Penalty",
-    "Oof"
-  ];
   //tracks the color for the data for home tab, also used in static_tracker, i think?, bad code too ngl
-  var color_tracker = ["b1","b2","b3","r1","r2","r3"]
 
   //ranking table generation
-  let ranktbl = document.createElement("table");
-  ranktbl.setAttribute("id", "ranktbl");
-  let rankthead = document.createElement("thead");
-  ranktbl.appendChild(rankthead)
-  let ranktblBody = document.createElement("tbody");
-  let rankheadRow = document.createElement("tr")
-  rankthead.appendChild(rankheadRow)
-  ranktbl.appendChild(ranktblBody);
-  //creating the rank labels
-  function rank_tableHead(){
-    for(var b =0; b<rank_HeadNames.length; b++){
-      const headCell = document.createElement("th");
-      rankheadRow.appendChild(headCell);
-      headCell.classList.add("headCell")
-      headCell.setAttribute("id", `head_cell_${b}`)
-      headCell.innerHTML = rank_HeadNames[b]
-    }
-    document.getElementById("rank-container").appendChild(ranktbl);
-  }
 
 
   //HOME TAB
   //picks up the match, both new or changed match, does not update if the data is deleted from the db, have to refresh
-  var homeHeadNames = dataStructure.createDataLabels(["QATA"], dataStructure.getDataLabels());
+  var homeHeadNames = dataStructure.createDataLabels("Match" , "Team"  , "Position", "Scout" , "Taxi"   , "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time", "Yeet");
   //general table generation
   const homeTable = new AddTable();
   homeTable.addHeader(homeHeadNames);
   var homeTableBody = homeTable.getTableBody();
   document.getElementById("table-container").appendChild(homeTable.getTable());
   //creating the table labels
-  
+  var color_tracker = ["b1","b2","b3","r1","r2","r3"]
+
   
   let setPath = dataStructure.getPath("Matches");
   onChildAdded(ref(db, setPath), (snapshot)=>{
@@ -425,10 +388,21 @@ console.log("success")
   //updates everytime a robot gets a new match
   //code runs over every robot due to trash firebase api and its ability to grab the data desired well
   //so everytime there is a new match, it kind of has to calculate everything again and have to redisplay all the data
-  onValue(ref(db, 'Events/BB2022/Robots/'), (snapshot)=>{
+  var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score","Taxi","Auto High","Auto Low","Auto Missed","Tele High","Tele Low","Tele Missed","Attempted Climb","Climb Points","Climb Time","Defense Time","Penalty","Oof Time");
+  //general table generation
+  const rankTable = new AddTable();
+  rankTable.addHeader(rankHeadNames);
+  var rankTableBody = rankTable.getTableBody();
+  document.getElementById("rank-container").appendChild(rankTable.getTable());
+
+  setPath = dataStructure.getPath("Robots");
+  onValue(ref(db, setPath), (snapshot)=>{
     const over = snapshot.val()
     var objNames = Object.keys(over)
     var sort_arr = [];
+    var weights = dataStructure.getWghtValues();
+    var equalizer = dataStructure.getPtValues();
+    var dataLabelsToCalc = rankHeadNames.splice(3);
     //for loop over each robot
     for(var r=0;r<objNames.length;r++){
     var data = over[objNames[r]];
@@ -436,49 +410,27 @@ console.log("success")
     var total_value = 0;
     var avg_temp={}
     //for loop over all data points wanted to be avg 
-    for(var i=0; i<val_tracker.length;i++){
+    for(var i=0; i<dataLabelsToCalc.length;i++){
       var temp_value = 0
       //adds up all match data for that data point wanted to be avged
       for(var j=0; j<keyNames.length; j++){
-        //transforms climb level to points
-        //adds value to temp val, which is the value that will later be avged
-        if(val_tracker[i] == "Climb Level"){
-          switch(data[keyNames[j]][val_tracker[i]]){
-            case "T":
-              temp_value += 15
-              break;
-            case "H":
-              temp_value += 10
-              break;
-            case "M":
-              temp_value +=6
-              break;
-            case "L":
-              temp_value += 4
-              break;
-            case "N":
-              temp_value += 0
-              break;
-          }
-        }else{
-          temp_value += parseInt(data[keyNames[j]][val_tracker[i]])
-        }
+                //adds value to temp val, which is the value that will later be avged
+          temp_value += parseInt(data[keyNames[j]][dataLabelsToCalc[i]])
       }
       //takes the the avg and rounds it to the tenth, then multiply by weight then equalizer, later want to make weight easily changeable
       //stores this avg int avg_tracker in table_cache
       temp_value/= keyNames.length
       temp_value = temp_value.toFixed(1)
-      avg_temp[val_tracker[i]] = temp_value
-      temp_value*= weights[weight_tracker[i]]
-      temp_value*= equalizer[equalizer_tracker[i]]
+      avg_temp[dataLabelsToCalc[i]] = temp_value
+      temp_value*= weights[i] *equalizer[i];
       temp_value = temp_value.toFixed(1)
       total_value+=parseFloat(temp_value)
     }
     //puts the total avg to the robot, and vice versa
     total_value = total_value.toFixed(1)
-    robot_avg_tracker[data[keyNames[0]]["ZTeam"]] = avg_temp
+    robot_avg_tracker[data[keyNames[0]]["Team"]] = avg_temp
 
-    robot_score_tracker[data[keyNames[0]]["ZTeam"]] = total_value
+    robot_score_tracker[data[keyNames[0]]["Team"]] = total_value
 
     }
     //sorts all the avgs
@@ -490,8 +442,11 @@ console.log("success")
     }
     sort_arr.sort(function(a,b){return a-b})
     var rank_counter = 1;
+    console.log(robot_avg_tracker)
+    console.log(robot_score_tracker)
+    console.log(dataLabelsToCalc)
     //has to reset everytime, see above for reason why (firebase api)
-    ranktblBody.innerHTML = ""
+    rankTableBody.innerHTML = ""
     //goes through all the avg, the by each avg, from greatest to least, checks all robots that have that avg then displays it in the table
     for(var g=sort_arr.length-1;g>=0;g--){
       for(var f=0; f<robot_score_key.length;f++){
@@ -526,17 +481,17 @@ console.log("success")
           cell.appendChild(cellText);
           cellText.appendChild(pushinP);
           //adds avg data to the row, then is displayed on the table
-          for(var b=0; b<val_tracker.length;b++){
+          for(var b=0; b<dataLabelsToCalc.length;b++){
             cellText = document.createElement("div");
           pushinP = document.createElement("p");
           cell = document.createElement("td");
 
-          pushinP.innerHTML = robot_avg_tracker[robot_score_key[f]][val_tracker[b]];
+          pushinP.innerHTML = robot_avg_tracker[robot_score_key[f]][dataLabelsToCalc[b]];
           row.appendChild(cell);
           cell.appendChild(cellText);
           cellText.appendChild(pushinP);
           }
-          ranktblBody.appendChild(row)
+          rankTableBody.appendChild(row)
         }
       }
     }
@@ -549,8 +504,6 @@ console.log("success")
 
   }
   )
-  table_tableHead()
-  rank_tableHead()
 
 
   //percentile work
