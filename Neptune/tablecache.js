@@ -1,9 +1,4 @@
-//home
-var static_tracker = {}
 
-//jahto
-var robot_score_tracker = {}
-var robot_avg_tracker = {}
 
 var pitscout_tracker = [
     "Timestamp",

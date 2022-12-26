@@ -92,11 +92,11 @@ console.log("success")
         label: team,
         backgroundColor: "rgba(255,0,0,0.2)",
         data: [
-          robot_avg_tracker[team]["Taxi"],
-          robot_avg_tracker[team]["Auto High"],
-          robot_avg_tracker[team]["Tele High"],
-          robot_avg_tracker[team]["Climb Level"],
-          robot_avg_tracker[team]["Defence Time"]
+          storedRobotsAvgPtVals[team]["Taxi"],
+          storedRobotsAvgPtVals[team]["Auto High"],
+          storedRobotsAvgPtVals[team]["Tele High"],
+          storedRobotsAvgPtVals[team]["Climb Level"],
+          storedRobotsAvgPtVals[team]["Defence Time"]
       ]
       }
     ]
@@ -312,15 +312,6 @@ console.log("success")
       }
     })
   }
-  //
-  //HOME TAB AND RANK TAB
-  //
-
-  //table head names for the rank tab
-  //tracks the color for the data for home tab, also used in static_tracker, i think?, bad code too ngl
-
-  //ranking table generation
-
 
   //HOME TAB
   //picks up the match, both new or changed match, does not update if the data is deleted from the db, have to refresh
@@ -332,22 +323,17 @@ console.log("success")
   document.getElementById("table-container").appendChild(homeTable.getTable());
   //creating the table labels
   var color_tracker = ["b1","b2","b3","r1","r2","r3"]
-
+  var homeCache = {};
   
   let setPath = dataStructure.getPath("Matches");
   onChildAdded(ref(db, setPath), (snapshot)=>{
     const data = snapshot.val()
-    
-        //if the match data is of a new match, meaning that if it is match 3 and has not other data
-        //set up six place holder rows for that match of b1,b2,b3,r1,r2,r3
-        //also create a place holder in the static_tracker (bad name)
-        //this allows it to be replaced easily by incoming data
-        //however, if the match data jumps it will not show up in order, will have to refresh to put in back in order
-        if(!static_tracker.hasOwnProperty(data["Match"])){
-          var temp_obj = {}
+
+        if(!homeCache.hasOwnProperty(data["Match"])){
+          var matchPlaceholder = {}
           for(var i=0; i<6; i++){
             const row = document.createElement("tr");
-            temp_obj[color_tracker[i]] = row
+            matchPlaceholder[color_tracker[i]] = row
             for(var g=0;g<homeHeadNames.length;g++){
 
               const cellText = document.createElement("div");
@@ -361,29 +347,29 @@ console.log("success")
               }
               else{
                 cellText.innerHTML = "NA";
-              }
-              
+              }              
               row.appendChild(cell);
               cell.appendChild(cellText);
               homeTableBody.appendChild(row);
               //console.log(data[color[i]][j+1][headNames[g]])
-    
-    
             }
           }
-          static_tracker[data["Match"]] = temp_obj;
+          homeCache[data["Match"]] = matchPlaceholder;
         }
-        //replace the place holder data, or if data already exists in that slot, replace the previous data
-        //this system allows for it to replace the data irt without having to reload
-        //does this buy calling the reference(? not sure what is exactly called) in static tracker to the row
-        //that wants to be replaced, creates a new row, then does .replaceChild to replace it, then changes the
-        //row in static tracker to the new row
-       var insert_val = static_tracker[data["Match"]][data["Position"]]
-        var row = homeTable.addRow(homeHeadNames, data)
-        homeTableBody.replaceChild(row, insert_val)
-        static_tracker[data["Match"]][data["position"]] = row
+
+        var replaced_row = homeCache[data["Match"]][data["Position"]]
+        var row = document.createElement("tr")
+        homeTable.addCells(homeHeadNames, data, row);
+        let color = data["Position"][0]
+        row.style.backgroundColor = "var(--" + color + ")"
+        row.style.color = "var(--text-color)"
+        homeTableBody.replaceChild(row, replaced_row)
+        homeCache[data["Match"]][data["position"]] = row
   }
   )
+
+
+
   //RANKING TAB
   //updates everytime a robot gets a new match
   //code runs over every robot due to trash firebase api and its ability to grab the data desired well
@@ -397,115 +383,44 @@ console.log("success")
 
   setPath = dataStructure.getPath("Robots");
   onValue(ref(db, setPath), (snapshot)=>{
-    const over = snapshot.val()
-    var objNames = Object.keys(over)
-    var sort_arr = [];
-    var weights = dataStructure.getWghtValues();
-    var equalizer = dataStructure.getPtValues();
+    const data = snapshot.val()
+    var robotNames = Object.keys(data)
     var dataLabelsToCalc = rankHeadNames.splice(3);
     //for loop over each robot
-    for(var r=0;r<objNames.length;r++){
-    var data = over[objNames[r]];
-    var keyNames = Object.keys(data)
-    var total_value = 0;
-    var avg_temp={}
-    //for loop over all data points wanted to be avg 
-    for(var i=0; i<dataLabelsToCalc.length;i++){
-      var temp_value = 0
-      //adds up all match data for that data point wanted to be avged
-      for(var j=0; j<keyNames.length; j++){
-                //adds value to temp val, which is the value that will later be avged
-          temp_value += parseInt(data[keyNames[j]][dataLabelsToCalc[i]])
-      }
-      //takes the the avg and rounds it to the tenth, then multiply by weight then equalizer, later want to make weight easily changeable
-      //stores this avg int avg_tracker in table_cache
-      temp_value/= keyNames.length
-      temp_value = temp_value.toFixed(1)
-      avg_temp[dataLabelsToCalc[i]] = temp_value
-      temp_value*= weights[i] *equalizer[i];
-      temp_value = temp_value.toFixed(1)
-      total_value+=parseFloat(temp_value)
-    }
-    //puts the total avg to the robot, and vice versa
-    total_value = total_value.toFixed(1)
-    robot_avg_tracker[data[keyNames[0]]["Team"]] = avg_temp
-
-    robot_score_tracker[data[keyNames[0]]["Team"]] = total_value
-
+    for(var i=0;i<robotNames.length;i++){
+    var robot = data[robotNames[i]];
+    dataStructure.calcRobotPtAvgs(dataLabelsToCalc, robot);
     }
     //sorts all the avgs
-    var robot_score_key = Object.keys(robot_score_tracker)
-    for(var d=0;d<robot_score_key.length;d++){
-      if(sort_arr.indexOf(robot_score_tracker[robot_score_key[d]]) == -1){
-        sort_arr.push(robot_score_tracker[robot_score_key[d]])
-      }
-    }
-    sort_arr.sort(function(a,b){return a-b})
+    var robotRankByPt = dataStructure.calcRobotRanking();
+    var storedRobotsTotalPtAvg = dataStructure.getStoredRobotsTotalPtAvg();
+    var storedRobotsAvgPtVals = dataStructure.getStoredRobotsAvgPtVals();
+    var allRobotPts = Object.keys(storedRobotsTotalPtAvg);
     var rank_counter = 1;
-    console.log(robot_avg_tracker)
-    console.log(robot_score_tracker)
-    console.log(dataLabelsToCalc)
+
     //has to reset everytime, see above for reason why (firebase api)
     rankTableBody.innerHTML = ""
     //goes through all the avg, the by each avg, from greatest to least, checks all robots that have that avg then displays it in the table
-    for(var g=sort_arr.length-1;g>=0;g--){
-      for(var f=0; f<robot_score_key.length;f++){
-        if(robot_score_tracker[robot_score_key[f]] == sort_arr[g]){
+    for(var i=robotRankByPt.length-1;i>=0;i--){
+      for(var f=0; f<allRobotPts.length;f++){
+        if(storedRobotsTotalPtAvg[allRobotPts[f]] == robotRankByPt[i]){
           //bad code
-        var row = document.createElement("tr")
-        var cellText = document.createElement("div");
-          var pushinP = document.createElement("p");
-          var cell = document.createElement("td");
+          var row = document.createElement("tr");
+          rankTableBody.appendChild(row);
+          rankTable.addCell(rank_counter, row);
+          rankTable.addCell(allRobotPts[f], row);
+          rankTable.addCell(storedRobotsTotalPtAvg[allRobotPts[f]], row);
 
-          pushinP.innerHTML = rank_counter;
-          rank_counter++;
-          row.appendChild(cell);
-          cell.appendChild(cellText);
-          cellText.appendChild(pushinP);
-
-          cellText = document.createElement("div");
-          pushinP = document.createElement("p");
-          cell = document.createElement("td");
-
-          pushinP.innerHTML = robot_score_key[f];
-          row.appendChild(cell);
-          cell.appendChild(cellText);
-          cellText.appendChild(pushinP);
-
-          cellText = document.createElement("div");
-          pushinP = document.createElement("p");
-          cell = document.createElement("td");
-
-          pushinP.innerHTML = robot_score_tracker[robot_score_key[f]];
-          row.appendChild(cell);
-          cell.appendChild(cellText);
-          cellText.appendChild(pushinP);
           //adds avg data to the row, then is displayed on the table
-          for(var b=0; b<dataLabelsToCalc.length;b++){
-            cellText = document.createElement("div");
-          pushinP = document.createElement("p");
-          cell = document.createElement("td");
 
-          pushinP.innerHTML = robot_avg_tracker[robot_score_key[f]][dataLabelsToCalc[b]];
-          row.appendChild(cell);
-          cell.appendChild(cellText);
-          cellText.appendChild(pushinP);
-          }
-          rankTableBody.appendChild(row)
+          robotAvgVals = storedRobotsAvgPtVals[allRobotPts[f]]
+          rankTable.addCells(dataLabelsToCalc, robotAvgVals, row);
         }
       }
     }
-    
-    /*for(var g=sort_arr.length-1;g>=0;g--){
-      for(var f=0; f<score_robot_tracker[sort_arr[g]].length;f++){
-        console.log(score_robot_tracker[sort_arr[g]][f])
-      }
-    }*/
 
   }
   )
-
-
   //percentile work
   /*onValue(ref(db, 'Events/BB2022/Robots/'), (data)=>{
     data = data.val()

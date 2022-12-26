@@ -29,27 +29,31 @@ class AddTable{
             headCell.innerHTML = rowHeadNames[i]
         }
     }
+    addCell(data, row){
+        this.cell = document.createElement("td");
+        this.cellText = document.createElement("div");
+        this.cellP = document.createElement("p");
 
-    addRow(rowHeadNames, data){
+        this.cellP.innerHTML = data;
+  
+        row.appendChild(this.cell);
+        this.cell.appendChild(this.cellText);
+        this.cellText.appendChild(this.cellP);
+    }
+    addCells(rowHeadNames, data, row){
         //needs to take data and return row that is passed onto something else
-            this.row = document.createElement("tr")
         for(var i=0;i<rowHeadNames.length;i++){
-            let color = data["Position"][0]
             this.cell = document.createElement("td");
             this.cellText = document.createElement("div");
             this.cellP = document.createElement("p");
 
             this.cellP.innerHTML = data[rowHeadNames[i]];
   
-            this.row.appendChild(this.cell);
+            row.appendChild(this.cell);
             this.cell.appendChild(this.cellText);
             this.cellText.appendChild(this.cellP);
             //console.log(data[color[i]][j+1][headNames[g]])
             
-            this.row.style.backgroundColor = "var(--" + color + ")"
-            this.row.style.color = "var(--text-color)"
           }
-
-        return this.row;
     }
 }
