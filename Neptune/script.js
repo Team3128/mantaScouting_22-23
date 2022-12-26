@@ -1,4 +1,3 @@
-
 const dataStructure = new DataStructure();
 const db = dataStructure.getFireBase();
 console.log("success")
@@ -6,42 +5,11 @@ console.log("success")
 //
 //=======================
 //SEARCH TAB
-  var robotData;
-  var robot_pitData;
-  var robot_imgData;
-  var searchState = true;
+var searchState = true;
+
 //gathers all the data under the path, not sure what it returns if path does not exist yet
-     function load(){
-      let setPath = dataStructure.getPath("Robots");
-       get(ref(db, setPath)).then((snapshot) => {
-        robotData = snapshot.val()
-        console.log(robotData)
-      })
-      setPath = dataStructure.getPath("Pitscout");
-       get(ref(db, setPath)).then((snapshot) => {
-        robot_pitData = snapshot.val()
-        console.log(robot_pitData)
-      })
-      setPath = dataStructure.getPath("Image");
-       get(ref(db, setPath)).then((snapshot) => {
-        robot_imgData = snapshot.val()
-        console.log(robot_imgData)
-      })
-    }
 //displays all the data that can be gathered
   function search(team) {
-    load()
-    //error appears if a path does not exist in the db, also for some reason needs to be run twice
-    //the first time when trying to search for a robot
-    let robotList = Object.keys(robotData);
-    let pitlist = Object.keys(robot_pitData);
-    let imglist = Object.keys(robot_imgData);
-    //if the robot does not exist in any off the paths, tell that the robot does not exist
-    if (!robotList.includes(team) && !pitlist.includes(team) && !imglist.includes(team)) {
-        alert("Robot doesn't exist")
-        return;
-    }
-    //reset the display page back to blank
     document.getElementById("miscData").innerHTML = "";
     document.getElementById("graphContainer").innerHTML = "";
     document.getElementById("dataContainer").innerHTML = "";
@@ -55,180 +23,181 @@ console.log("success")
         searchState = false;
     }
 
-    //if there is scouting app data from the robot, display it here, otherwise say that there is current none avail
-    if(robotList.includes(team)){
-      //gets the specific robots data
-      var teamData = robotData[team]
-    var matches = Object.keys(teamData)
-    //as of right now it is called misc, should be changed for redability
-    //displays the drive train and shooter from the match date from scouting app, code should be changed
-    //to scan over the data and take the most said drivetrain/shooter, not just taking the first matches data
-    let misc_container = document.getElementById("miscData"); 
-    let misc_arr = [
-        ["Drivetrain", "Shooter"],
-        [teamData[matches[0]]["Drivetrain Type"], teamData[matches[0]]["Shooter Type"]]
-    ]
-    const tbl = document.createElement("table");
-    const tblBody = document.createElement("tbody");
-    for (let i = 0; i < 2; i++) {
-        const row = document.createElement("tr");
-        for (let j = 0; j < 2; j++) {
-            const cell = document.createElement("td");
-            cell.innerHTML = misc_arr[j][i];
-            row.appendChild(cell);
+    function generateRobotData(robotData){
+      if(robotData){
+        //gets the specific robots data
+      var matches = Object.keys(robotData)
+      //as of right now it is called misc, should be changed for redability
+      //displays the drive train and shooter from the match date from scouting app, code should be changed
+      //to scan over the data and take the most said drivetrain/shooter, not just taking the first matches data
+      let misc_container = document.getElementById("miscData"); 
+      let misc_arr = [
+          ["Drivetrain", "Shooter"],
+          [robotData[matches[0]]["Drivetrain Type"], robotData[matches[0]]["Shooter Type"]]
+      ]
+      const tbl = document.createElement("table");
+      const tblBody = document.createElement("tbody");
+      for (let i = 0; i < 2; i++) {
+          const row = document.createElement("tr");
+          for (let j = 0; j < 2; j++) {
+              const cell = document.createElement("td");
+              cell.innerHTML = misc_arr[j][i];
+              row.appendChild(cell);
+          }
+          tblBody.appendChild(row);
+      }
+      tbl.appendChild(tblBody);
+      misc_container.appendChild(tbl);
+  
+  
+      //displays the graph, is really janky due to lack of time, pulls robot avg from robot_avg_tracker in table cache.js
+      //takes taxi, auto high, tele high, climb level and defense time avg to display
+      var graphLabels = ["Taxi", "Auto High", "Tele High", "Climb Level", "Defence Time"]
+      var marksData = {
+        labels: graphLabels,
+        datasets: [{
+          label: team,
+          backgroundColor: "rgba(255,0,0,0.2)",
+          data: [
+            storedRobotsAvgPtVals[team]["Taxi"],
+            storedRobotsAvgPtVals[team]["Auto High"],
+            storedRobotsAvgPtVals[team]["Tele High"],
+            storedRobotsAvgPtVals[team]["Climb Level"],
+            storedRobotsAvgPtVals[team]["Defence Time"]
+        ]
         }
-        tblBody.appendChild(row);
-    }
-    tbl.appendChild(tblBody);
-    misc_container.appendChild(tbl);
-
-
-    //displays the graph, is really janky due to lack of time, pulls robot avg from robot_avg_tracker in table cache.js
-    //takes taxi, auto high, tele high, climb level and defense time avg to display
-    var graphLabels = ["Taxi", "Auto High", "Tele High", "Climb Level", "Defence Time"]
-    var marksData = {
-      labels: graphLabels,
-      datasets: [{
-        label: team,
-        backgroundColor: "rgba(255,0,0,0.2)",
-        data: [
-          storedRobotsAvgPtVals[team]["Taxi"],
-          storedRobotsAvgPtVals[team]["Auto High"],
-          storedRobotsAvgPtVals[team]["Tele High"],
-          storedRobotsAvgPtVals[team]["Climb Level"],
-          storedRobotsAvgPtVals[team]["Defence Time"]
       ]
       }
-    ]
-    }
-    var holder = document.createElement("canvas")
-    var robotChart = new Chart(holder, {
-        type: "radar",
-        data: marksData,
-        options:{
-
-        }
-    })
-    document.getElementById("graphContainer").appendChild(holder)
-
+      var holder = document.createElement("canvas")
+      var robotChart = new Chart(holder, {
+          type: "radar",
+          data: marksData,
+          options:{
+  
+          }
+      })
+      document.getElementById("graphContainer").appendChild(holder)
+  
+      
+      //displays the data from the all the matches the robot played
+      //this is the specific data that we want pulled from the matches
+      var data_display = [
+        "ZMatch Number",
+        "Alliance Color",
+        "Taxi",
+        "Auto High",
+        "Auto Low",
+        "Auto Missed",
+        "Tele High",
+        "Tele Low",
+        "Tele Missed",
+        "Attempted Climb",
+        "Climb Level",
+        "Climb Time",
+        "Defence Time",
+        "Penalty",
+        "Yeet",
+        "Oof"
+      ];
+    //using the data_display above, it creates a table header and prepares the body for code below
+      let tb2 = document.createElement("table");
+    let tb2thead = document.createElement("thead")
+    tb2.appendChild(tb2thead)
+    let tb2Body = document.createElement("tbody");
+    let tb2headRow = document.createElement("tr")
+    tb2thead.appendChild(tb2headRow)
+    tb2.appendChild(tb2Body);
+      for(var b =0; b<data_display.length; b++){
+        const headCell = document.createElement("th");
+        tb2headRow.appendChild(headCell);
+        headCell.classList.add("headCell")
+        headCell.setAttribute("id", `head_cell_${b}`)
+        headCell.innerHTML = data_display[b]
+      }
+      document.getElementById("dataContainer").appendChild(tb2);
+      //this is the code that goes into the body, going match by match and adding a new row to the table body for each match
+      //currentlty is not ordered by match, due to matching numbering error (01 is counted as a string, messing things up)
+      for(var f=0;f<matches.length;f++){
+         var row = document.createElement("tr");
+        for(var g=0;g<data_display.length;g++){
+          const cellText = document.createElement("div");
+          const pushinP = document.createElement("p");
+          const cell = document.createElement("td");
     
-    //displays the data from the all the matches the robot played
-    //this is the specific data that we want pulled from the matches
-    var data_display = [
-      "ZMatch Number",
-      "Alliance Color",
-      "Taxi",
-      "Auto High",
-      "Auto Low",
-      "Auto Missed",
-      "Tele High",
-      "Tele Low",
-      "Tele Missed",
-      "Attempted Climb",
-      "Climb Level",
-      "Climb Time",
-      "Defence Time",
-      "Penalty",
-      "Yeet",
-      "Oof"
-    ];
-  //using the data_display above, it creates a table header and prepares the body for code below
-    let tb2 = document.createElement("table");
-  let tb2thead = document.createElement("thead")
-  tb2.appendChild(tb2thead)
-  let tb2Body = document.createElement("tbody");
-  let tb2headRow = document.createElement("tr")
-  tb2thead.appendChild(tb2headRow)
-  tb2.appendChild(tb2Body);
-    for(var b =0; b<data_display.length; b++){
-      const headCell = document.createElement("th");
-      tb2headRow.appendChild(headCell);
+          pushinP.innerHTML = robotData[matches[f]][data_display[g]];
+    
+          row.appendChild(cell);
+          cell.appendChild(cellText);
+          cellText.appendChild(pushinP);
+          //console.log(data[color[i]][j+1][headNames[g]])
+          
+          let color = robotData[matches[f]]["Alliance Color"][0];
+          row.style.backgroundColor = "var(--" + color + ")"
+          row.style.color = "var(--text-color)"
+    
+        }
+        tb2.appendChild(row)
+      }
+    
+      
+      //similar to the code above for the match data, it pulls from the same spot except this time it is just the qata
+      //below for setting up the qata display is bad code, can be condensed, cleaned up
+      let tb3 = document.createElement("table");
+      let tb3thead = document.createElement("thead")
+      tb3.appendChild(tb3thead)
+      let tb3Body = document.createElement("tbody");
+      let tb3headRow = document.createElement("tr")
+      tb3thead.appendChild(tb3headRow)
+      tb3.appendChild(tb3Body);
+      var headCell = document.createElement("th");
+      tb3headRow.appendChild(headCell);
       headCell.classList.add("headCell")
       headCell.setAttribute("id", `head_cell_${b}`)
-      headCell.innerHTML = data_display[b]
-    }
-    document.getElementById("dataContainer").appendChild(tb2);
-    //this is the code that goes into the body, going match by match and adding a new row to the table body for each match
-    //currentlty is not ordered by match, due to matching numbering error (01 is counted as a string, messing things up)
-    for(var f=0;f<matches.length;f++){
-       var row = document.createElement("tr");
-      for(var g=0;g<data_display.length;g++){
-        const cellText = document.createElement("div");
-        const pushinP = document.createElement("p");
-        const cell = document.createElement("td");
-  
-        pushinP.innerHTML = teamData[matches[f]][data_display[g]];
-  
+      headCell.innerHTML = "Matches"
+      headCell = document.createElement("th");
+      tb3headRow.appendChild(headCell);
+      headCell.classList.add("headCell")
+      headCell.setAttribute("id", `head_cell_${b}`)
+      headCell.innerHTML = "QATA"
+      tb3.appendChild(tb3Body);
+      //like above code it gets all the qata by match and displays it, out of order as of right now, problem with formatting in db
+      for(var d=0;d<matches.length;d++){
+        var row = document.createElement("tr");
+        var cellText = document.createElement("div");
+        var pushinP = document.createElement("p");
+        var cell = document.createElement("td");
+    
+        pushinP.innerHTML = matches[d];
+    
         row.appendChild(cell);
         cell.appendChild(cellText);
         cellText.appendChild(pushinP);
-        //console.log(data[color[i]][j+1][headNames[g]])
-        
-        let color = teamData[matches[f]]["Alliance Color"][0];
-        row.style.backgroundColor = "var(--" + color + ")"
-        row.style.color = "var(--text-color)"
   
+        cellText = document.createElement("div");
+        pushinP = document.createElement("p");
+        cell = document.createElement("td");
+    
+        pushinP.innerHTML = robotData[matches[d]]["QATA"];
+    
+        row.appendChild(cell);
+        cell.appendChild(cellText);
+        cellText.appendChild(pushinP);
+        tb3Body.appendChild(row)
       }
-      tb2.appendChild(row)
+  
+      document.getElementById("qataContainer").appendChild(tb3);
+      
+      }else{ //just displays that the data is not available
+        document.getElementById("miscData").innerHTML = "NO MISC AVAILABLE YET";
+      document.getElementById("graphContainer").innerHTML = "NO GRAPH AVAILABLE YET";
+      document.getElementById("dataContainer").innerHTML = "NO DATA AVAILABLE YET";
+      document.getElementById("qataContainer").innerHTML = "NO QATA AVAILABLE YET";
+      }
     }
-  
-    
-    //similar to the code above for the match data, it pulls from the same spot except this time it is just the qata
-    //below for setting up the qata display is bad code, can be condensed, cleaned up
-    let tb3 = document.createElement("table");
-    let tb3thead = document.createElement("thead")
-    tb3.appendChild(tb3thead)
-    let tb3Body = document.createElement("tbody");
-    let tb3headRow = document.createElement("tr")
-    tb3thead.appendChild(tb3headRow)
-    tb3.appendChild(tb3Body);
-    var headCell = document.createElement("th");
-    tb3headRow.appendChild(headCell);
-    headCell.classList.add("headCell")
-    headCell.setAttribute("id", `head_cell_${b}`)
-    headCell.innerHTML = "Matches"
-    headCell = document.createElement("th");
-    tb3headRow.appendChild(headCell);
-    headCell.classList.add("headCell")
-    headCell.setAttribute("id", `head_cell_${b}`)
-    headCell.innerHTML = "QATA"
-    tb3.appendChild(tb3Body);
-    //like above code it gets all the qata by match and displays it, out of order as of right now, problem with formatting in db
-    for(var d=0;d<matches.length;d++){
-      var row = document.createElement("tr");
-      var cellText = document.createElement("div");
-      var pushinP = document.createElement("p");
-      var cell = document.createElement("td");
-  
-      pushinP.innerHTML = matches[d];
-  
-      row.appendChild(cell);
-      cell.appendChild(cellText);
-      cellText.appendChild(pushinP);
-
-      cellText = document.createElement("div");
-      pushinP = document.createElement("p");
-      cell = document.createElement("td");
-  
-      pushinP.innerHTML = teamData[matches[d]]["QATA"];
-  
-      row.appendChild(cell);
-      cell.appendChild(cellText);
-      cellText.appendChild(pushinP);
-      tb3Body.appendChild(row)
-    }
-
-    document.getElementById("qataContainer").appendChild(tb3);
-    
-    }else{ //just displays that the data is not available
-      document.getElementById("miscData").innerHTML = "NO MISC AVAILABLE YET";
-    document.getElementById("graphContainer").innerHTML = "NO GRAPH AVAILABLE YET";
-    document.getElementById("dataContainer").innerHTML = "NO DATA AVAILABLE YET";
-    document.getElementById("qataContainer").innerHTML = "NO QATA AVAILABLE YET";
-    }
+    dataStructure.searchAndShowRobotData("Robots", team, db, generateRobotData);
 
     //dispalys image, if robot does not exist under it say data unavailable
-    if(imglist.includes(team)){
+    if(robotImgs){
       var imgData = robot_imgData[team]
       var imgamount = Object.keys(imgData)
       if (imgamount.length != 0) {
@@ -248,7 +217,7 @@ console.log("success")
     }
     //Pitscout data, want to make it so it displays all pitscouted data but lack of time could not do it
     // also displays no data if the robot does not exist
-    if(pitlist.includes(team)){
+    if(robotPitData){
       var pitData = robot_pitData[team]
       let pits_container = document.getElementById("pitsData"); //change later to array, not object. really fucking scrappy code v2
       var pitstuff = ["Robot Weight", "Drivetrain Motors", "Motor Type"]

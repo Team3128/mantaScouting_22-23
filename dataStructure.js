@@ -148,4 +148,12 @@ class DataStructure {
         return this.robotRankByPt;
     }
     
+    searchAndShowRobotData(path, team, db, func) {
+        this.setPath = this.getPath(path + "/" + team);
+        get(ref(db, this.setPath)).then((snapshot) => {
+            this.data = snapshot.val()
+            func(this.data)
+        })
+    }
+
 }
