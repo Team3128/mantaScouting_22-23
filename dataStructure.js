@@ -20,10 +20,14 @@ class DataStructure {
             "Penalty",
             "Oof Time"
         ]
-        this.ptValues = [3, 4, 2, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0]
+        this.wghtValues = [1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0];
+        this.ptValues = [3, 4, 2, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0];
+        this.storedRobotsTotalPtAvg = {}
+        this.storedRobotsAvgPtVals = {}
+
         this.pitscoutLabels = ["Timestamp", "Team Number", "Pitscout Name", "Drivetrain Type", "Robot Weight", "Number of DT Motors", "Motor Type", "Vision", "Auto", "Endgame", "Aluminum Assistance", "Miscellaneous"];
 
-        this.firebasePath = "Events/BB2022/";
+        this.firebasePath = "Events/RRRefactor/";
         this.firebaseConfig = {
             apiKey: "AIzaSyAO1aIe_fTZB6duj8YIRyYcLTINlcP196w",
             authDomain: "escouting-7b4e0.firebaseapp.com",
@@ -73,6 +77,18 @@ class DataStructure {
     setDataValues(i, val) {
         this.dataValues[i] = val;
     }
+    getWghtValues() {
+        return this.wghtValues;
+    }
+    getPtValues() {
+        return this.ptValues;
+    }
+    getStoredRobotsTotalPtAvg(){
+        return this.storedRobotsTotalPtAvg;
+    }
+    getStoredRobotsAvgPtVals(){
+        return this.storedRobotsAvgPtVals;
+    }
 
     validateValues() {
 
@@ -82,6 +98,62 @@ class DataStructure {
         this.app = initializeApp(this.firebaseConfig);
         this.database = getDatabase(this.app);
         return this.database;
+    }
+
+    createDataLabels(...givenLabels){
+        this.lableArray = [];
+        for(var i =0; i<givenLabels.length;i++){
+            this.lableArray.push(givenLabels[i])
+        }
+        return this.lableArray;
+    }
+
+    calcRobotPtAvgs(dataLabelsToCalc, robot){
+        this.matches = Object.keys(robot)
+        this.totalPtAvg = 0;
+        this.robotAvgPtVals={}
+        //for loop over all data points wanted to be avg 
+        for(var i=0; i<dataLabelsToCalc.length;i++){
+        this.singlePtAvg = 0
+        //adds up all match data for that data point wanted to be avged
+        for(var j=0; j<this.matches.length; j++){
+                    //adds value to temp val, which is the value that will later be avged
+            this.singlePtAvg += parseInt(robot[this.matches[j]][dataLabelsToCalc[i]])
+        }
+        //takes the the avg and rounds it to the tenth, then multiply by weight then equalizer, later want to make weight easily changeable
+        //stores this avg int avg_tracker in table_cache
+        this.singlePtAvg/= this.matches.length
+        this.singlePtAvg = this.singlePtAvg.toFixed(1)
+        this.robotAvgPtVals[dataLabelsToCalc[i]] = this.singlePtAvg
+        this.singlePtAvg*= this.wghtValues[i] * this.ptValues[i];
+        this.singlePtAvg = this.singlePtAvg.toFixed(1)
+        this.totalPtAvg+=parseFloat(this.singlePtAvg)
+        }
+        //puts the total avg to the robot, and vice versa
+        this.totalPtAvg = this.totalPtAvg.toFixed(1)
+        this.storedRobotsAvgPtVals[robot[this.matches[0]]["Team"]] = this.robotAvgPtVals
+
+        this.storedRobotsTotalPtAvg[robot[this.matches[0]]["Team"]] = this.totalPtAvg
+    }
+
+    calcRobotRanking(){
+        this.robotRankByPt = [];
+        this.allRobotPts = Object.keys(this.storedRobotsTotalPtAvg)
+        for(var i=0;i<this.allRobotPts.length;i++){
+          if(this.robotRankByPt.indexOf(this.storedRobotsTotalPtAvg[this.allRobotPts[i]]) == -1){
+            this.robotRankByPt.push(this.storedRobotsTotalPtAvg[this.allRobotPts[i]])
+          }
+        }
+        this.robotRankByPt.sort(function(a,b){return a-b})
+        return this.robotRankByPt;
+    }
+    
+    searchAndShowRobotData(path, team, db, func) {
+        this.setPath = this.getPath(path + "/" + team);
+        get(ref(db, this.setPath)).then((snapshot) => {
+            this.data = snapshot.val()
+            func(this.data)
+        })
     }
 
 }
