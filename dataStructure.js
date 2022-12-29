@@ -27,7 +27,7 @@ class DataStructure {
 
         this.pitscoutLabels = ["Timestamp", "Team Number", "Pitscout Name", "Drivetrain Type", "Robot Weight", "Number of DT Motors", "Motor Type", "Vision", "Auto", "Endgame", "Aluminum Assistance", "Miscellaneous"];
 
-        this.firebasePath = "Events/RRRefactor/";
+        this.firebasePath = "Events/Nep2nTest/";
         this.firebaseConfig = {
             apiKey: "AIzaSyAO1aIe_fTZB6duj8YIRyYcLTINlcP196w",
             authDomain: "escouting-7b4e0.firebaseapp.com",
