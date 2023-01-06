@@ -25,12 +25,14 @@ export class AddTable{
     addHeader(rowHeadNames){
         for(var i=0; i<rowHeadNames.length; i++){
             const headCell = document.createElement("th");
+            headCell.classList.add("head-cell")
             this.hRow.appendChild(headCell);
             headCell.innerHTML = rowHeadNames[i]
         }
     }
     addCell(data, row){
         this.cell = document.createElement("td");
+        this.cell.classList.add("cell")
         this.cellText = document.createElement("div");
         this.cellP = document.createElement("p");
 

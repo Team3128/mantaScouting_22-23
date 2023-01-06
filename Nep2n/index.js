@@ -1,13 +1,14 @@
 // Import the functions you need from the SDKs you need
+import { getDatabase, ref, child, get, onChildAdded } from "firebase/database";
 import { initializeApp } from "firebase/app";
 import { DataStructure } from "./modules/dataStructure";
 import { Percentile } from "./modules/percentile";
-import { DataConverter } from "./modules/decode";
-import { getDatabase, ref, child, get } from "firebase/database";
+import { DataConverter } from "./modules/decoder";
 import { SwitchPage } from "./modules/switchPage";
+import { AddTable } from "./modules/addTable"
 
 
-
+const dataStructure = new DataStructure()
 const firebaseConfig = {
   apiKey: "AIzaSyAO1aIe_fTZB6duj8YIRyYcLTINlcP196w",
   authDomain: "escouting-7b4e0.firebaseapp.com",
@@ -21,10 +22,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const dbRef = ref(getDatabase());
+const db = getDatabase();
 
-get(child(dbRef, "Events/BB2022/Robots")).then((snapshot) => {
-})
 
 
 //Navigation
@@ -45,10 +44,20 @@ document.addEventListener("keydown", function(e) {
       pageChange.toggleState = true;
     }
   }
+  if(e.key == "Enter"){
+    if(pageChange.currentState == "search"){
+      e.preventDefault();
+      search()
+    }
+    
+  }
 })
 
-//Home
+pageChange.switchEvent("search")
+
+//=============== HOME ===============
 var homeHeadNames = dataStructure.createDataLabels("Match" , "Team"  , "Position", "Scout" , "Taxi"   , "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time", "Yeet");
+
 //general table generation
 const homeTable = new AddTable();
 homeTable.addHeader(homeHeadNames);
@@ -84,7 +93,6 @@ onChildAdded(ref(db, setPath), (snapshot)=>{
             row.appendChild(cell);
             cell.appendChild(cellText);
             homeTableBody.appendChild(row);
-            //console.log(data[color[i]][j+1][headNames[g]])
           }
         }
         homeCache[data["Match"]] = matchPlaceholder;
@@ -93,11 +101,27 @@ onChildAdded(ref(db, setPath), (snapshot)=>{
       var replaced_row = homeCache[data["Match"]][data["Position"]]
       var row = document.createElement("tr")
       homeTable.addCells(homeHeadNames, data, row);
-      let color = data["Position"][0]
-      row.style.backgroundColor = "var(--" + color + ")"
-      row.style.color = "var(--text-color)"
       homeTableBody.replaceChild(row, replaced_row)
       homeCache[data["Match"]][data["position"]] = row
 }
 )
+
+
+//=============== SEARCH ===============
+
+function search( team ){
+  //if no team arg is passed, then search() will use the value in the search bar
+  if(!team){
+    team = document.getElementById("searchbar").value;
+    document.getElementById("searchbar").innerHTML = team;
+  }
+  //if the search bar is still in the default position, then move it
+  if(document.getElementById("barContainer").classList.contains("default")){
+    document.getElementById("barContainer").classList.remove("default")
+    document.getElementById("barContainer").classList.add("active")
+  }
+
+  
+
+}
 

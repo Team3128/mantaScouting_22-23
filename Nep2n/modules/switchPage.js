@@ -30,11 +30,20 @@ export class SwitchPage {
     }
     switchEvent(index){
         try{
+             if(index == "back"){
+                this.hidePanel()
+                this.toggleState = false;
+                return;
+             }
+             document.getElementById(this.currentState).style = "display: none";
             document.getElementById(this.currentState).classList.add("hide");
             document.getElementById(index).classList.remove("hide");
-            this.currentState = index;
-            this.hidePanel()
-            this.toggleState = false;
+            document.getElementById(index).style = "display: grid";
+            setTimeout(()=>{
+                this.currentState = index;
+                this.hidePanel()
+                this.toggleState = false;
+            }, 50)
         }
         catch(err){
             alert("Err switching page: Page id or page name does not exist")
