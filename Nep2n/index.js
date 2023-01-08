@@ -53,7 +53,7 @@ document.addEventListener("keydown", function(e) {
   }
 })
 
-pageChange.switchEvent("search")
+pageChange.switchEvent("predict")
 
 //=============== HOME ===============
 var matchData = []
@@ -218,3 +218,4 @@ function search( team ){
   )
 }
 
+//=============== PREDICT ===============
