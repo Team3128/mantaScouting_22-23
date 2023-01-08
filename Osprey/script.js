@@ -2,7 +2,7 @@
 let state = "init", matchNum, scoutNum, teamNum, teamPos, timer = 150, delay = true, rowContent = [], notesToggled = false, matchInfo = [], allianceColor = "n";
 
 let timeInt = 1000; // Time Interval, SHOULD BE 1000!!!!!!!
-let testing = true; // DISABLES INTRO PAGE CHECKS IF TRUE
+let testing = false; // DISABLES INTRO PAGE CHECKS IF TRUE
 
 let startAudio = new Audio("sfx/start.wav")
 
@@ -110,6 +110,7 @@ document.getElementById("searchBtn").addEventListener("click", ()=>{
         console.log("No data found")
         return
     }
+
     console.log("Search term: " + searchTerm)
     console.log("Data: " + value)
 
@@ -124,6 +125,7 @@ document.getElementById("searchBtn").addEventListener("click", ()=>{
     document.getElementById('qrOutput').style.width = length;
     document.getElementById('qrOutput').style.height = length;
     */
+
     document.getElementById('qrOutput').innerHTML = qr.createImgTag();
     console.log("Data found for match " + searchTerm + ": ");
     console.log(value);
@@ -811,6 +813,7 @@ function transition(i){
 }
 
 function resetGame(){
+    
     state="init";
     timer = 150;
     delay = true;
