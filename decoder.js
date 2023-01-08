@@ -1,4 +1,4 @@
-class DataConverter {
+export class DataConverter {
     data;
     method;
     i;

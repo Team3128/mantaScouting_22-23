@@ -2,11 +2,11 @@
 import { getDatabase, ref, child, get, onChildAdded, onValue } from "firebase/database";
 import { Chart } from "chart.js/auto"
 import { initializeApp } from "firebase/app";
-import { DataStructure } from "./modules/dataStructure";
+import { DataStructure } from "../dataStructure";
 import { Percentile } from "./modules/percentile";
-import { DataConverter } from "./modules/decoder";
+import { DataConverter } from "../decoder";
 import { SwitchPage } from "./modules/switchPage";
-import { AddTable } from "./modules/addTable"
+import { AddTable } from "../addTable"
 
 
 const dataStructure = new DataStructure()
