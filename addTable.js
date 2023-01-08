@@ -1,4 +1,4 @@
-class AddTable{
+export class AddTable{
     constructor(){
         this.row;
         this.cell;

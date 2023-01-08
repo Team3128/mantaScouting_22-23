@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "snowpack dev",
+    "mercy":"snowpack dev --config config/Mercy.config.js",
+    "nep2n":"snowpack dev --config config/Nep2n.config.js",
+    "osprey":"snowpack dev --config config/Osprey.config.js",
     "build": "snowpack build"
   },
   "repository": {
