@@ -216,6 +216,9 @@ function search( team ){
       }
     }
   )
+
+  //=============== COMPARE ===============
+  // onChildAdded(ref(db, dataStructure.getPath("Robot")))
 }
 
 //=============== PREDICT ===============
