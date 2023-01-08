@@ -1,31 +1,48 @@
 //0,0,r1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-class DataStructure {
+export class DataStructure {
     constructor() {
     //                0         1         2           3         4          5            6           7              8            9           10             11                 12              13            14              15         16          17        18       
-        this.dataValues = [0       , 0       , ""        , ""      , false    , 0          , 0         , 0            , 0          , 0         , 0            , false            , 0             , 0           , 0             , false    , 0         , ""      , ""];
-        this.dataLabels = ["Match" , "Team"  , "Position", "Scout" , "Taxi"   , "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time", "Yeet"  , "QATA"];
-        this.dataTypes  = ["number", "number", "string"  , "string", "boolean", "number"   , "number"  , "number"     , "number"   , "number"  , "number"     , "boolean"        , "number"      , "number"    , "number"      , "boolean", "number"  , "string", "string"];
+        this.dataValues = [0,0,"","",
+            false,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,false,
+            0,0,0,"","",""];
+        this.dataLabels = ["Match", "Team", "Position", "Scout", 
+            "Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", 
+            "High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park",
+            "Defense Time", "Penalty Count", "Oof Time", "Climb QATA", "Link QATA", "QATA"];
+        this.dataTypes  = ["number", "number", "string", "string",
+            "boolean", "number", "number", "number", "number", "number", "number", "number", "number",
+            "number", "number", "number", "number", "number", "number", "number", "number", "boolean", 
+            "number", "number", "number", "string", "string", "string"];            
         this.avgFilterLabels=[
-            "Taxi",
-            "Auto High",
-            "Auto Low",
-            "Auto Missed",
-            "Tele High",
-            "Tele Low",
-            "Tele Missed",
-            "Attempted Climb",
-            "Climb Points",
-            "Climb Time",
-            "Defence Time",
-            "Penalty",
+            "Mobility",
+            "Auto High Cube",
+            "Auto Mid Cube",
+            "Auto Low Cube",
+            "Auto High Cone",
+            "Auto Mid Cone",
+            "Auto Low Cone",
+            "Auto Fumbled",
+            "Auto Climb", 
+            "High Cube",
+            "Mid Cube",
+            "Low Cube",
+            "High Cone",
+            "Mid Cone",
+            "Low Cone",
+            "Fumbled",
+            "Climb", 
+            "Park", 
+            "Defense Time",
+            "Penalty Count",
             "Oof Time"
         ]
-        this.wghtValues = [1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0];
-        this.ptValues = [3, 4, 2, 0, 2, 1, 0, 0, 1, 0, 0, 0, 0];
+        this.wghtValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        this.ptValues = [3, 6, 4, 3, 6, 4, 3, 0, 12, 5, 3, 2, 5, 3, 2, 0, 10, 2, 0, 0, 0];
         this.storedRobotsTotalPtAvg = {}
         this.storedRobotsAvgPtVals = {}
 
-        this.pitscoutLabels = ["Timestamp", "Team Number", "Pitscout Name", "Drivetrain Type", "Robot Weight", "Number of DT Motors", "Motor Type", "Vision", "Auto", "Endgame", "Aluminum Assistance", "Miscellaneous"];
+        this.pitscoutLabels = ["Team", "Scout Name", "Drivetrain", "Robot Weight", "Number of Motors", "Motor Type", "Vision", "Auto", "Auto Climb", "Endgame Climb", "Piece Type", "Manipulator", "Aluminum Assistance", "Miscellaneous"];
 
         this.firebasePath = "Events/Nep2nTest/";
         this.firebaseConfig = {

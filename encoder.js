@@ -1,4 +1,4 @@
-class Encoder{
+export class Encoder{
     constructor(){
         this.rawDataToEncode = [];
         this.formattedJsonData = {}
