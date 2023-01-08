@@ -1,4 +1,5 @@
-
+import { Encoder } from '../encoder'
+import { DataStructure } from '../dataStructure'
 const encoder = new Encoder();
 const dataStructure = new DataStructure();
 const db = dataStructure.getFireBase();
@@ -40,9 +41,9 @@ function uploadData() {
   for(var i=0;i<sorted_data.length;i++){
           var data = sorted_data[i];
           
-          formattedData = encoder.rawDataToFormattedData(data, dataStructure.dataLabels);
+          var formattedData = encoder.rawDataToFormattedData(data, dataStructure.dataLabels);
 
-          uploadStatus = encoder.uploadFormattedData(db, formattedData, dataStructure)
+          var uploadStatus = encoder.uploadFormattedData(db, formattedData, dataStructure)
 
           if(uploadStatus == true){
             document.getElementById("status").innerHTML += "Successful Upload for " + formattedData["Match"] + "-" + formattedData["Position"] + "<br>" ;

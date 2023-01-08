@@ -1,3 +1,4 @@
+import { ref, remove, set, child } from "firebase/database";
 export class Encoder{
     constructor(){
         this.rawDataToEncode = [];
