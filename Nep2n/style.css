@@ -317,13 +317,10 @@ body{
     text-align: center;
 }
 
-#graphContainer{
-    grid-row: 8/11;
-    grid-column: 1/3;
-}
-.chartjs-render-monitor{
-    background-color: white;
-    padding-bottom:10vh;
+#chartContainer{
+    grid-row: 1/11;
+    grid-column: 1/11;
+    z-index: 100;
 }
 #dataContainer{
     font-family: var(--font);

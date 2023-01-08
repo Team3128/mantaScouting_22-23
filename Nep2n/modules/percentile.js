@@ -6,6 +6,7 @@ export class Percentile{
     constructor(data){
         this.data = data;
         this.percentileObject = {};
+        this.percentileObjectSorted = [];
     }
 
     convertRawToObject(){
@@ -38,14 +39,21 @@ export class Percentile{
     }
     processObjectData(){
         
+
         this.percentileObject.autoPoints = []
         this.percentileObject.teleAccuracy = []
         this.percentileObject.autoAccuracy = []
         this.percentileObject.shootingPoints = []
         
-        for(let i=0; i<this.percentileObject["Alliance Color"].length; i++){ //should reference global obj
-            
+        for(let i=0; i<this.percentileObject["Match"].length; i++){ //should reference global obj
+            if(this.percentileObject["Taxi"][i] == "false"){
+                this.percentileObject["Taxi"][i] = "0"
+            }
+            if(this.percentileObject["Taxi"][i] == "true"){
+                this.percentileObject["Taxi"][i] = "1"
+            }
             let auto_pts = (this.percentileObject["Auto High"][i]*4) + (this.percentileObject["Auto Low"][i]*2) + (this.percentileObject["Taxi"][i]*2)
+
 
             let auto_high = parseInt(this.percentileObject["Auto High"][i]), auto_low = parseInt(this.percentileObject["Auto Low"][i]), auto_missed = parseInt(this.percentileObject["Auto Missed"][i]);
             let auto_acc = (auto_high + auto_low)/(auto_high + auto_low + auto_missed);
@@ -64,13 +72,33 @@ export class Percentile{
             }
             this.percentileObject.shootingPoints.push(shooting_pts);
         }
-        console.log(this.percentileObject)
     }
-    findPercentileOf(val, name){
+    sortPercentile(){
+        let percentileArr = Object.values(this.percentileObject);
+        let percentileKeys = Object.keys(this.percentileObject);
+        for(let i=0; i< percentileArr.length; i++){
+            for(let j=0; j<percentileArr[i].length; j++){
+                if(percentileArr[i][j] == "true"){
+                    percentileArr[i][j] = 1
+                }
+                else if(percentileArr[i][j] == "false"){
+                    percentileArr[i][j] = 0
+                }
+                else if(!isNaN(Number(percentileArr[i][j]))){
+                    percentileArr[i][j] = Number(percentileArr[i][j]);
+                }
+                else{
+                    //do nothing
+                }
+            }
+           this.percentileObjectSorted[percentileKeys[i]] = percentileArr[i].sort(function(a, b){return a - b});
+        }
+        return this;
+    }
+    findPercentileOf(val, name, sorted_data){
         for(let i=0; i<this.percentileObjectSorted[name].length; i++){
             if(this.percentileObjectSorted[name][i] > val){
-                console.log(i/this.percentileObjectSorted[name].length);
-                return;
+                return(i/this.percentileObjectSorted[name].length);
             }
         }
     }

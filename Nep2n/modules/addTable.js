@@ -30,6 +30,9 @@ export class AddTable{
             headCell.innerHTML = rowHeadNames[i]
         }
     }
+    createRow (){
+        return document.createElement("tr");
+    }
     addCell(data, row){
         this.cell = document.createElement("td");
         this.cell.classList.add("cell")
@@ -56,6 +59,8 @@ export class AddTable{
             this.cellText.appendChild(this.cellP);
             //console.log(data[color[i]][j+1][headNames[g]])
             
-          }
+            
+        }
+        return row;
     }
 }

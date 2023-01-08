@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
-import { getDatabase, ref, child, get, onChildAdded } from "firebase/database";
+import { getDatabase, ref, child, get, onChildAdded, onValue } from "firebase/database";
+import { Chart } from "chart.js/auto"
 import { initializeApp } from "firebase/app";
 import { DataStructure } from "./modules/dataStructure";
 import { Percentile } from "./modules/percentile";
@@ -23,7 +24,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase();
-
 
 
 //Navigation
@@ -56,7 +56,8 @@ document.addEventListener("keydown", function(e) {
 pageChange.switchEvent("search")
 
 //=============== HOME ===============
-var homeHeadNames = dataStructure.createDataLabels("Match" , "Team"  , "Position", "Scout" , "Taxi"   , "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time", "Yeet");
+var matchData = []
+var homeHeadNames = dataStructure.createDataLabels("Match" , "Team"  , "Position", "Scout" , "Taxi"  , "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time", "Yeet");
 
 //general table generation
 const homeTable = new AddTable();
@@ -70,7 +71,7 @@ var homeCache = {};
 let setPath = dataStructure.getPath("Matches");
 onChildAdded(ref(db, setPath), (snapshot)=>{
   const data = snapshot.val()
-
+      matchData.push(snapshot.val())
       if(!homeCache.hasOwnProperty(data["Match"])){
         var matchPlaceholder = {}
         for(var i=0; i<6; i++){
@@ -105,10 +106,14 @@ onChildAdded(ref(db, setPath), (snapshot)=>{
       homeCache[data["Match"]][data["position"]] = row
 }
 )
-
+console.log(matchData)
 
 //=============== SEARCH ===============
-
+let robotData = []
+onChildAdded(ref(db, dataStructure.getPath("Robots")), (snapshot)=>{
+  robotData.push(snapshot.val())
+})
+console.log(robotData)
 function search( team ){
   //if no team arg is passed, then search() will use the value in the search bar
   if(!team){
@@ -120,8 +125,96 @@ function search( team ){
     document.getElementById("barContainer").classList.remove("default")
     document.getElementById("barContainer").classList.add("active")
   }
+  //Checks if robot exists in database
+  let teams = [];
+  let teamData = [];
+  for(let i=0; i<robotData.length; i++){
+    teams.push(Object.values(robotData[i])[0]["Team"])
+  }
+  //TO DO: place pitscouting data
+  if(!teams.includes(team)){
+    alert("Team does not exist in database")
+    return;
+  }
+  else{
+    //team found in database, compiling team data into teamData array for easier access for charts etc. 
+    for(let i=0; i<robotData.length; i++){
+      if( team == Object.values(robotData[i])[0]["Team"]){
+        teamData = Object.values(robotData[i])
+      }
+    }
+  }
+  console.log(teamData)
+  teams = undefined;
+  // Image generation here wallim do it
 
-  
+  //General data: Purely quantitative data, no descriptions or words, only numbers and bools
+  var generalSearchData = new AddTable()
+  let generalLabels = ["Match", "Position", "Auto High", "Auto Low", "Auto Missed", "Taxi", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time"]
+  generalSearchData.addHeader(generalLabels);
+  //gettin each match
+  for(let i=0; i<teamData.length; i++){
+    //appending each match to a row
+    generalSearchData.getTableBody().appendChild(generalSearchData.addCells(generalLabels, teamData[i], generalSearchData.createRow()))
+  }
+   document.getElementById("dataContainer").appendChild(generalSearchData.table);
 
+   //Qualatative data (Qata): Only descriptions/words
+   var qataSearchData = new AddTable()
+   let qataLabels = ["Match", "Position", "Scout", "Yeet", "QATA"]
+   qataSearchData.addHeader(qataLabels);
+   //gettin each match
+   for(let i=0; i<teamData.length; i++){
+     //appending each match to a row
+     qataSearchData.getTableBody().appendChild(qataSearchData.addCells(qataLabels, teamData[i], qataSearchData.createRow()))
+   }
+    document.getElementById("qataContainer").appendChild(qataSearchData.table);
+
+  //Misc data: Drivetrain, turret
+
+  //chart/graph: Radar graph of most important data
+  let percentile;
+  onValue(ref(db, 'Events/Nep2nTest/Robots/'), (data)=>{
+    data = data.val()
+    percentile = new Percentile(data);
+    percentile.convertRawToObject().processObjectData()
+    percentile.sortPercentile();
+  })
+  const data = {
+    labels: [
+      'Eating',
+      'Drinking',
+      'Sleeping',
+      'Designing',
+      'Coding',
+      'Cycling',
+      'Running'
+    ],
+    datasets: [{
+      label: ("Team " + team + " Percentiles"),
+      data: [65, 59, 90, 81, 56, 55, 40],
+      fill: true,
+      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+      borderColor: 'rgb(255, 99, 132)',
+      pointBackgroundColor: 'rgb(255, 99, 132)',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgb(255, 99, 132)'
+    }]
+  };
+
+  new Chart(
+    document.getElementById("chartContainer"), {
+      type: "radar", 
+      data: data,
+      options : {
+        elements:{
+          line: {
+            borderWidth: 3
+          }
+        }
+      }
+    }
+  )
 }
 
