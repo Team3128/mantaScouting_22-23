@@ -53,10 +53,14 @@ document.addEventListener("keydown", function(e) {
       e.preventDefault();
       predict();
     }
+    else if(pageChange.currentState == "compare"){
+      e.preventDefault();
+      compgen();
+    }
   }
 })
 
-pageChange.switchEvent("home")
+pageChange.switchEvent("compare")
 
 //=============== HOME ===============
 var matchData = []
@@ -161,9 +165,11 @@ function search( team ){
   let generalLabels = ["Match", "Position", "Auto High", "Auto Low", "Auto Missed", "Taxi", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time"]
   generalSearchData.addHeader(generalLabels);
   //gettin each match
+  var row = document.createElement("tr");
+
   for(let i=0; i<teamData.length; i++){
     //appending each match to a row
-    generalSearchData.getTableBody().appendChild(generalSearchData.addCells(generalLabels, teamData[i], generalSearchData.createRow()))
+    generalSearchData.getTableBody().appendChild(generalSearchData.addCells(generalLabels, teamData[i], generalSearchData.appendChild(row)))
   }
    document.getElementById("dataContainer").appendChild(generalSearchData.table);
 
@@ -224,10 +230,75 @@ function search( team ){
       }
     }
   )
-
-  //=============== COMPARE ===============
-  // onChildAdded(ref(db, dataStructure.getPath("Robot")))
+  
 }
+//=============== COMPARE ===============
+let cRobotData = []
+onChildAdded(ref(db, dataStructure.getPath("Robots")), (snapshot)=>{
+  cRobotData.push(snapshot.val())
+})
+console.log(cRobotData)
+function compgen(team){
+  if(!team){
+    team = document.getElementById("c-searchbar").value;
+    document.getElementById("c-searchbar").innerHTML = team;
+  }
+  if(document.getElementById("c-barContainer").classList.contains("default")){
+    document.getElementById("c-barContainer").classList.remove("default")
+    document.getElementById("c-barContainer").classList.add("active")
+  }
+
+  let teams = [];
+  let teamData = [];
+  for(let i = 0; i < cRobotData.length; i++){
+    teams.push(Object.values(robotData[i])[0]["Team"])
+  }
+  if(!teams.includes(team)){
+    alert("Team does not exist in databse")
+    return;
+  }
+  else{
+    for(let i = 0; i < cRobotData.length; i++){
+      if(team == Object.values(cRobotData[i])[0]["Team"]){
+        teamData = Object.values(cRobotData[i])
+      }
+    }
+  }
+  console.log(teamData)
+  teams = undefined;
+
+  var gencomparedata = new AddTable()
+  let genlabels = ["Match", "Team", "Position", "Scout", 
+  "Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", 
+  "High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park",
+  "Defense Time", "Penalty Count", "Oof Time"]
+  gencomparedata.addHeader(genlabels);
+  
+  for(let i = 0; i < teamData.length; i++){
+    var row = document.createElement("tr");
+    var name = gencomparedata.getTableBody();
+    name.appendChild(row);
+    gencomparedata.addCells(genlabels, teamData[i], row);
+  }  
+  document.getElementById("c-dataContainer").appendChild(gencomparedata.table);
+
+  var qatacomparedata = new AddTable();
+  let qatalabels = ["Match", "Position", "Scout", "Climb QATA", "Link QATA", "QATA"];
+  qatacomparedata.addHeader(qatalabels);
+
+  for(let i = 0; i < teamData.length; i++){
+    var row = document.createElement("tr");
+    var name = qatacomparedata.getTableBody();
+    name.appendChild(row);
+    qatacomparedata.addCells(qatalabels, teamData[i], row);
+  }
+  document.getElementById("c-qataContainer").appendChild(qatacomparedata.table);
+}
+
+//REAL COMPARE FUNCTION WOOOOOO
+// function compare(){
+
+// }
 //=============== RANKING ===============
 var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
 "Mobility",
