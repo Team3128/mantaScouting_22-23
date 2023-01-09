@@ -11,8 +11,8 @@ export class DataStructure {
             "High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park",
             "Defense Time", "Penalty Count", "Oof Time", "Climb QATA", "Link QATA", "QATA"];
         this.dataTypes  = ["number", "number", "string", "string",
-            "boolean", "number", "number", "number", "number", "number", "number", "number", "number",
-            "number", "number", "number", "number", "number", "number", "number", "number", "boolean", 
+            "number", "number", "number", "number", "number", "number", "number", "number", "number",
+            "number", "number", "number", "number", "number", "number", "number", "number", "number", 
             "number", "number", "number", "string", "string", "string"];            
         this.avgFilterLabels=[
             "Mobility",

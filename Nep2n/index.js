@@ -49,7 +49,10 @@ document.addEventListener("keydown", function(e) {
       e.preventDefault();
       search()
     }
-    
+    else if (pageChange.currentState == "predict") {
+      e.preventDefault();
+      predict();
+    }
   }
 })
 
@@ -219,3 +222,25 @@ function search( team ){
 }
 
 //=============== PREDICT ===============
+function predict() {
+  // get team numbers
+  let b1 = parseInt(document.getElementById("blue1").value);
+  let b2 = parseInt(document.getElementById("blue2").value);
+  let b3 = parseInt(document.getElementById("blue3").value);
+  let r1 = parseInt(document.getElementById("red1").value);
+  let r2 = parseInt(document.getElementById("red2").value);
+  let r3 = parseInt(document.getElementById("red3").value);
+  // set scores
+  let blueScore = 0;
+  let redScore = 0;
+  console.log(b1 + " " + b2 + " " + b3 + " " + r1 + " " + r2 + " " + r3);
+  // set winner
+  let w = document.getElementById("winner");
+  if (blueScore > redScore) {
+    w.innerHTML = "BLUE WINS";
+  } else if (redScore > blueScore) {
+    w.innerHTML = "RED WINS";
+  } else {
+    w.innerHTML = "TIE";
+  }
+}
