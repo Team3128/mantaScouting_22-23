@@ -226,7 +226,114 @@ function search( team ){
   )
 
   //=============== COMPARE ===============
-  // onChildAdded(ref(db, dataStructure.getPath("Robot")))
+  let cRobotData = []
+onChildAdded(ref(db, dataStructure.getPath("Robots")), (snapshot)=>{
+  cRobotData.push(snapshot.val())
+})
+console.log(cRobotData)
+
+//func starts here
+function compare(team1, team2){
+  //args for compare
+  if(!team1){
+    team1 = document.getElementById("1-searchbar").value;
+    document.getElementById("1-searchbar").innerHTML = team1;
+  }
+  if(!team2){
+    team2 = document.getElementById("2-searchbar").value;
+    document.getElementById("2-searchbar").innerHTML = team2;
+  }
+  //move searchbar from default
+  if(document.getElementById("1-barContainer").classList.contains("default")){
+    document.getElementById("1-barContainer").classList.remove("default")
+    document.getElementById("1-barContainer").classList.add("active")
+  }
+  if(document.getElementById("2-barContainer").classList.contains("default")){
+    document.getElementById("2-barContainer").classList.remove("default")
+    document.getElementById("2-barContainer").classList.add("active")
+  }
+
+  //does it exist? yoinked from search
+  let teams = [];
+  let teamDataOne = [];
+  let teamDataTwo = [];
+  for(let i = 0; i < cRobotData.length; i++){
+    teams.push(Object.values(cRobotData[i])[0]["Team"])
+  }
+  //t1
+  if(!teams.includes(team1)){
+    alert("Team 1 does not exist in databse")
+    return;
+  }
+  else{
+    for(let i = 0; i < cRobotData.length; i++){
+      if(team1 == Object.values(cRobotData[i])[0]["Team"]){
+        teamDataOne = Object.values(cRobotData[i])
+      }
+    }
+  }
+
+  //t2
+  if(!teams.includes(team2)){
+    alert("Team 2 does not exist in databse")
+    return;
+  }
+  else{
+    for(let i = 0; i < cRobotData.length; i++){
+      if(team2 == Object.values(cRobotData[i])[0]["Team"]){
+        teamDataTwo = Object.values(cRobotData[i])
+      }
+    }
+  }
+
+  console.log(teamDataOne);
+  console.log(teamDataTwo);
+  teams = undefined;
+
+  //gen data
+  //t1
+  var genDataOne = new AddTable()
+  let genLabels = ["Match", "Team", "Position", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", "High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park", "Defense Time", "Penalty Count", "Oof Time"]
+  genDataOne.addHeader(genLabels);
+
+  //pull match
+  for(let i = 0; i<teamDataOne.length; i++){
+    genDataOne.getTableBody().appendChild(genDataOne.addCells(genLabels, teamData[i], genDataOne.createRow()))
+  }
+  document.getElementById("1-dataContainer").appendChild(genDataOne.table);
+
+  //t2
+  var genDataTwo = new AddTable();
+  genDataTwo.addHeader(genLabels);
+
+  //pull match
+  for(let i = 0; i<teamDataTwo.length; i++){
+    genDataTwo.getTableBody().appendChild(genDataTwo.addCells(genLabels, teamData[i], genDataTwo.createRow()))
+  }
+  document.getElementById("2-dataContainer").appendChild(genDataTwo.table);
+
+  //qata things
+  //t1
+  var qataOne = new AddTable()
+  let qataLabels = ["Match", "Position", "Scout", "Climb QATA", "Link QATA", "QATA"]
+  qataOne.addHeader(qataLabels);
+  //pull match
+  for(let i = 0; i < teamDataOne.length; i++){
+    qataOne.getTableBody().appendChild(qataOne,addCells(qataLabels, teamDataOne[i], qataOne.createRow()))
+  }
+  document.getElementById("1-qataContainer").appendChild(qataOne.table);
+
+  //t2
+  let qataTwo = new AddTable()
+  qataTwo.addHeader(qataLabels);
+  //pull match
+  for(let i = 0; i < teamDataTwo.length; i++){
+    qataTwo.getTableBody().appendChild(qataOne, addCells(qataLabels, teamDataTwo[i], qataTwo.createRow()))
+  }
+  document.getElementById("2-qataContainer").appendChild(qataTwo.table);
+
+  //graphs -- do later 
+}
 }
 //=============== RANKING ===============
 var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
