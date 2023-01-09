@@ -371,3 +371,37 @@ body{
 #viewpage > .hide{
     display: none;
 }
+
+/* Compare tab */
+/* #viewpage > #compare{
+    background-color: var(--bg-color);
+    grid-template-columns: repeat(10,10vw);
+    grid-template-rows: repeat(10, 9.5vh);
+    height: 95vh;
+    margin-top: 2.5vh;
+    margin-bottom: 2.5vh;
+    width: 100vw;
+    overflow:hidden;
+}
+#compare > div.split{
+    grid-row: 2/4;
+    grid-column: 3/9;
+
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 30vw;
+    height: 10vh;
+    
+    display: flex;
+}
+
+#compare > div.active{
+    grid-row:1/2;
+    grid-column: 6/11;
+    margin: 1vh;
+    margin-right: 5vw;
+
+    display: flex;
+} */
+ 
+
