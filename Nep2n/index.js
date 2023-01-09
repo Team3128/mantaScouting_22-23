@@ -2,11 +2,11 @@
 import { getDatabase, ref, child, get, onChildAdded, onValue } from "firebase/database";
 import { Chart } from "chart.js/auto"
 import { initializeApp } from "firebase/app";
-import { DataStructure } from "./modules/dataStructure";
+import { DataStructure } from "../dataStructure";
 import { Percentile } from "./modules/percentile";
-import { DataConverter } from "./modules/decoder";
+import { DataConverter } from "../decoder";
 import { SwitchPage } from "./modules/switchPage";
-import { AddTable } from "./modules/addTable"
+import { AddTable } from "../addTable"
 
 
 const dataStructure = new DataStructure()
@@ -49,15 +49,21 @@ document.addEventListener("keydown", function(e) {
       e.preventDefault();
       search()
     }
-    
+    else if (pageChange.currentState == "predict") {
+      e.preventDefault();
+      predict();
+    }
   }
 })
 
-pageChange.switchEvent("search")
+pageChange.switchEvent("home")
 
 //=============== HOME ===============
 var matchData = []
-var homeHeadNames = dataStructure.createDataLabels("Match" , "Team"  , "Position", "Scout" , "Taxi"  , "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time", "Yeet");
+var homeHeadNames = dataStructure.createDataLabels("Match", "Team", "Position", "Scout", 
+"Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", 
+"High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park",
+"Defense Time", "Penalty Count", "Oof Time");
 
 //general table generation
 const homeTable = new AddTable();
@@ -70,6 +76,8 @@ var homeCache = {};
 
 let setPath = dataStructure.getPath("Matches");
 onChildAdded(ref(db, setPath), (snapshot)=>{
+
+  //call the consolidate function here, and add the consolidated data instead
   const data = snapshot.val()
       matchData.push(snapshot.val())
       if(!homeCache.hasOwnProperty(data["Match"])){
@@ -217,114 +225,152 @@ function search( team ){
     }
   )
 }
-
- //=============== COMPARE ===============
+//=============== COMPARE ===============
+//general function for compare
 let cRobotData = []
 onChildAdded(ref(db, dataStructure.getPath("Robots")), (snapshot)=>{
-  cRobotData.push(snapshot.val())
+  robotData.push(snapshot.val())
 })
 console.log(cRobotData)
-
-//func starts here
-function compare(team1, team2){
-  //args for compare
-  if(!team1){
-    team1 = document.getElementById("1-searchbar").value;
-    document.getElementById("1-searchbar").innerHTML = team1;
+function compgen(team){
+  if(!team){
+    team = document.getElementById("c-searchbar").value;
+    document.getElementById("c-searchbar").innerHTML = team;
   }
-  if(!team2){
-    team2 = document.getElementById("2-searchbar").value;
-    document.getElementById("2-searchbar").innerHTML = team2;
-  }
-  //move searchbar from default
-  if(document.getElementById("1-barContainer").classList.contains("default")){
-    document.getElementById("1-barContainer").classList.remove("default")
-    document.getElementById("1-barContainer").classList.add("active")
-  }
-  if(document.getElementById("2-barContainer").classList.contains("default")){
-    document.getElementById("2-barContainer").classList.remove("default")
-    document.getElementById("2-barContainer").classList.add("active")
+  if(document.getElementById("c-barContainer").classList.contains("default")){
+    document.getElementById("c-barContainer").classList.remove("default")
+    document.getElementById("c-barContainer").classList.add("active")
   }
 
-  //does it exist? yoinked from search
   let teams = [];
-  let teamDataOne = [];
-  let teamDataTwo = [];
+  let teamData = [];
   for(let i = 0; i < cRobotData.length; i++){
-    teams.push(Object.values(cRobotData[i])[0]["Team"])
+    teams.push(Object.values(robotData[i])[0]["Team"])
   }
-  //t1
-  if(!teams.includes(team1)){
-    alert("Team 1 does not exist in databse")
+  if(!teams.includes(team)){
+    alert("Team does not exist in databse")
     return;
   }
   else{
     for(let i = 0; i < cRobotData.length; i++){
-      if(team1 == Object.values(cRobotData[i])[0]["Team"]){
-        teamDataOne = Object.values(cRobotData[i])
+      if(team == Object.values(cRobotData[i])[0]["Team"]){
+        teamData = Object.values(cRobotData[i])
       }
     }
   }
-
-  //t2
-  if(!teams.includes(team2)){
-    alert("Team 2 does not exist in databse")
-    return;
-  }
-  else{
-    for(let i = 0; i < cRobotData.length; i++){
-      if(team2 == Object.values(cRobotData[i])[0]["Team"]){
-        teamDataTwo = Object.values(cRobotData[i])
-      }
-    }
-  }
-
-  console.log(teamDataOne);
-  console.log(teamDataTwo);
+  console.log(teamData)
   teams = undefined;
 
-  //gen data
-  //t1
-  var genDataOne = new AddTable()
-  let genLabels = ["Match", "Team", "Position", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", "High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park", "Defense Time", "Penalty Count", "Oof Time"]
-  genDataOne.addHeader(genLabels);
-
-  //pull match
-  for(let i = 0; i<teamDataOne.length; i++){
-    genDataOne.getTableBody().appendChild(genDataOne.addCells(genLabels, teamData[i], genDataOne.createRow()))
+  var gencomparedata = new AddTable()
+  let genlabels = ["Match", "Position", "Auto High", "Auto Low", "Auto Missed", "Taxi", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time"]
+  gencomparedata.addHeader(genlabels);
+  
+  for(let i = 0; i < teamData.length; i++){
+    gencomparedata.getTableBody().appendChild(gencomparedata.addCells(genlables, teamData[i], gencomparedata.createRow()))
   }
-  document.getElementById("1-dataContainer").appendChild(genDataOne.table);
+  document.getElementById("c-dataContainer").appendChild(gencomparedata.table);
 
-  //t2
-  var genDataTwo = new AddTable();
-  genDataTwo.addHeader(genLabels);
+  var qatacomparedata = new AddTable();
+  let qatalabels = ["Match", "Position", "Scout", "Yeet", "QATA"];
+  qatacomparedata.addHeader(qatalabels);
 
-  //pull match
-  for(let i = 0; i<teamDataTwo.length; i++){
-    genDataTwo.getTableBody().appendChild(genDataTwo.addCells(genLabels, teamData[i], genDataTwo.createRow()))
+  for(let i = 0; i < teamData.length; i++){
+    qatacomparedata.getTableBody().appendChild(qatacomparedata.addCells(qatalabels, teamData[i], qatacomparedata.createRow()));
   }
-  document.getElementById("2-dataContainer").appendChild(genDataTwo.table);
-
-  //qata things
-  //t1
-  var qataOne = new AddTable()
-  let qataLabels = ["Match", "Position", "Scout", "Climb QATA", "Link QATA", "QATA"]
-  qataOne.addHeader(qataLabels);
-  //pull match
-  for(let i = 0; i < teamDataOne.length; i++){
-    qataOne.getTableBody().appendChild(qataOne,addCells(qataLabels, teamDataOne[i], qataOne.createRow()))
-  }
-  document.getElementById("1-qataContainer").appendChild(qataOne.table);
-
-  //t2
-  let qataTwo = new AddTable()
-  qataTwo.addHeader(qataLabels);
-  //pull match
-  for(let i = 0; i < teamDataTwo.length; i++){
-    qataTwo.getTableBody().appendChild(qataOne, addCells(qataLabels, teamDataTwo[i], qataTwo.createRow()))
-  }
-  document.getElementById("2-qataContainer").appendChild(qataTwo.table);
-
-  //graphs -- do later 
+  document.getElementById("c-qataContainer").appendChild(qatacomparedata.table);
 }
 
+// function compare(team)
+//=============== RANKING ===============
+var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
+"Mobility",
+"Auto High Cube",
+"Auto Mid Cube",
+"Auto Low Cube",
+"Auto High Cone",
+"Auto Mid Cone",
+"Auto Low Cone",
+"Auto Fumbled",
+"Auto Climb", 
+"High Cube",
+"Mid Cube",
+"Low Cube",
+"High Cone",
+"Mid Cone",
+"Low Cone",
+"Fumbled",
+"Climb", 
+"Park", 
+"Defense Time",
+"Penalty Count",
+"Oof Time");
+  //general table generation
+  const rankTable = new AddTable();
+  rankTable.addHeader(rankHeadNames);
+  var rankTableBody = rankTable.getTableBody();
+  document.getElementById("rank-container").appendChild(rankTable.getTable());
+
+  setPath = dataStructure.getPath("Robots");
+  onValue(ref(db, setPath), (snapshot)=>{
+    const data = snapshot.val()
+    var robotNames = Object.keys(data)
+    var dataLabelsToCalc = rankHeadNames.splice(3);
+    //for loop over each robot
+    for(var i=0;i<robotNames.length;i++){
+    var robot = data[robotNames[i]];
+    dataStructure.calcRobotPtAvgs(dataLabelsToCalc, robot);
+    }
+    //sorts all the avgs
+    var robotRankByPt = dataStructure.calcRobotRanking();
+    var storedRobotsTotalPtAvg = dataStructure.getStoredRobotsTotalPtAvg();
+    var storedRobotsAvgPtVals = dataStructure.getStoredRobotsAvgPtVals();
+    var allRobotPts = Object.keys(storedRobotsTotalPtAvg);
+    var rank_counter = 1;
+
+    //has to reset everytime, see above for reason why (firebase api)
+    rankTableBody.innerHTML = ""
+    //goes through all the avg, the by each avg, from greatest to least, checks all robots that have that avg then displays it in the table
+    for(var i=robotRankByPt.length-1;i>=0;i--){
+      for(var f=0; f<allRobotPts.length;f++){
+        if(storedRobotsTotalPtAvg[allRobotPts[f]] == robotRankByPt[i]){
+        
+          var row = document.createElement("tr");
+          rankTableBody.appendChild(row);
+          rankTable.addCell(rank_counter, row);
+          rankTable.addCell(allRobotPts[f], row);
+          rankTable.addCell(storedRobotsTotalPtAvg[allRobotPts[f]], row);
+
+          //adds avg data to the row, then is displayed on the table
+
+          var robotAvgVals = storedRobotsAvgPtVals[allRobotPts[f]]
+          rankTable.addCells(dataLabelsToCalc, robotAvgVals, row);
+        }
+      }
+      rank_counter+=1
+    }
+
+  }
+  )
+//=============== PREDICT ===============
+function predict() {
+  // get team numbers
+  let b1 = parseInt(document.getElementById("blue1").value);
+  let b2 = parseInt(document.getElementById("blue2").value);
+  let b3 = parseInt(document.getElementById("blue3").value);
+  let r1 = parseInt(document.getElementById("red1").value);
+  let r2 = parseInt(document.getElementById("red2").value);
+  let r3 = parseInt(document.getElementById("red3").value);
+  // set scores
+  let blueScore = 0;
+  let redScore = 0;
+  console.log(b1 + " " + b2 + " " + b3 + " " + r1 + " " + r2 + " " + r3);
+  // set winner
+  let w = document.getElementById("winner");
+  if (blueScore > redScore) {
+    w.innerHTML = "BLUE WINS";
+  } else if (redScore > blueScore) {
+    w.innerHTML = "RED WINS";
+  } else {
+    w.innerHTML = "TIE";
+  }
+}
