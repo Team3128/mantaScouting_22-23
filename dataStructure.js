@@ -38,8 +38,8 @@ export class DataStructure {
             "Penalty Count",
             "Oof Time"
         ]
-        this.wghtValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        this.ptValues = [3, 6, 4, 3, 6, 4, 3, 0, 12, 5, 3, 2, 5, 3, 2, 0, 10, 2, 0, 0, 0];
+        this.wghtValues = [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0];
+        this.ptValues = [3, 6, 4, 3, 6, 4, 3, 0, 1, 5, 3, 2, 5, 3, 2, 0, 1, 2, 0, 0, 0];
         this.storedRobotsTotalPtAvg = {}
         this.storedRobotsAvgPtVals = {}
 
@@ -152,6 +152,7 @@ export class DataStructure {
         this.storedRobotsAvgPtVals[robot[this.matches[0]]["Team"]] = this.robotAvgPtVals
 
         this.storedRobotsTotalPtAvg[robot[this.matches[0]]["Team"]] = this.totalPtAvg
+
     }
 
     calcRobotRanking(){

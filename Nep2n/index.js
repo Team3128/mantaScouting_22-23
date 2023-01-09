@@ -53,11 +53,14 @@ document.addEventListener("keydown", function(e) {
   }
 })
 
-pageChange.switchEvent("predict")
+pageChange.switchEvent("home")
 
 //=============== HOME ===============
 var matchData = []
-var homeHeadNames = dataStructure.createDataLabels("Match" , "Team"  , "Position", "Scout" , "Taxi"  , "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time", "Yeet");
+var homeHeadNames = dataStructure.createDataLabels("Match", "Team", "Position", "Scout", 
+"Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", 
+"High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park",
+"Defense Time", "Penalty Count", "Oof Time");
 
 //general table generation
 const homeTable = new AddTable();
@@ -70,6 +73,8 @@ var homeCache = {};
 
 let setPath = dataStructure.getPath("Matches");
 onChildAdded(ref(db, setPath), (snapshot)=>{
+
+  //call the consolidate function here, and add the consolidated data instead
   const data = snapshot.val()
       matchData.push(snapshot.val())
       if(!homeCache.hasOwnProperty(data["Match"])){
@@ -220,5 +225,74 @@ function search( team ){
   //=============== COMPARE ===============
   // onChildAdded(ref(db, dataStructure.getPath("Robot")))
 }
+//=============== RANKING ===============
+var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
+"Mobility",
+"Auto High Cube",
+"Auto Mid Cube",
+"Auto Low Cube",
+"Auto High Cone",
+"Auto Mid Cone",
+"Auto Low Cone",
+"Auto Fumbled",
+"Auto Climb", 
+"High Cube",
+"Mid Cube",
+"Low Cube",
+"High Cone",
+"Mid Cone",
+"Low Cone",
+"Fumbled",
+"Climb", 
+"Park", 
+"Defense Time",
+"Penalty Count",
+"Oof Time");
+  //general table generation
+  const rankTable = new AddTable();
+  rankTable.addHeader(rankHeadNames);
+  var rankTableBody = rankTable.getTableBody();
+  document.getElementById("rank-container").appendChild(rankTable.getTable());
 
+  setPath = dataStructure.getPath("Robots");
+  onValue(ref(db, setPath), (snapshot)=>{
+    const data = snapshot.val()
+    var robotNames = Object.keys(data)
+    var dataLabelsToCalc = rankHeadNames.splice(3);
+    //for loop over each robot
+    for(var i=0;i<robotNames.length;i++){
+    var robot = data[robotNames[i]];
+    dataStructure.calcRobotPtAvgs(dataLabelsToCalc, robot);
+    }
+    //sorts all the avgs
+    var robotRankByPt = dataStructure.calcRobotRanking();
+    var storedRobotsTotalPtAvg = dataStructure.getStoredRobotsTotalPtAvg();
+    var storedRobotsAvgPtVals = dataStructure.getStoredRobotsAvgPtVals();
+    var allRobotPts = Object.keys(storedRobotsTotalPtAvg);
+    var rank_counter = 1;
+
+    //has to reset everytime, see above for reason why (firebase api)
+    rankTableBody.innerHTML = ""
+    //goes through all the avg, the by each avg, from greatest to least, checks all robots that have that avg then displays it in the table
+    for(var i=robotRankByPt.length-1;i>=0;i--){
+      for(var f=0; f<allRobotPts.length;f++){
+        if(storedRobotsTotalPtAvg[allRobotPts[f]] == robotRankByPt[i]){
+        
+          var row = document.createElement("tr");
+          rankTableBody.appendChild(row);
+          rankTable.addCell(rank_counter, row);
+          rankTable.addCell(allRobotPts[f], row);
+          rankTable.addCell(storedRobotsTotalPtAvg[allRobotPts[f]], row);
+
+          //adds avg data to the row, then is displayed on the table
+
+          var robotAvgVals = storedRobotsAvgPtVals[allRobotPts[f]]
+          rankTable.addCells(dataLabelsToCalc, robotAvgVals, row);
+        }
+      }
+      rank_counter+=1
+    }
+
+  }
+  )
 //=============== PREDICT ===============

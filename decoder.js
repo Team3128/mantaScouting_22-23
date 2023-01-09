@@ -36,4 +36,5 @@ export class DataConverter {
         }
         return this.data;
     }
+    //take auto cube high and auto cone high -> auto high
 }
