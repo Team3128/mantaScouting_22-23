@@ -418,8 +418,9 @@ body{
 }
 
 #mainTable{
+    
     border-collapse: collapse;
-    font-size: 1rem;
+    font-size: 0.6rem;
     font-family: "Roboto Mono", monospace;
     
     width: 70%;

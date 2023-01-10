@@ -1,7 +1,7 @@
 //variable declarations
 let state = "init", matchNum, scoutNum, teamNum, teamPos, timer = 150, delay = true, rowContent = [], notesToggled = false, matchInfo = [], allianceColor = "n";
 
-let timeInt = 1000; // Time Interval, SHOULD BE 1000!!!!!!!
+let timeInt = 10; // Time Interval, SHOULD BE 1000!!!!!!!
 let testing = false; // DISABLES INTRO PAGE CHECKS IF TRUE
 
 let startAudio = new Audio("sfx/start.wav")
@@ -60,6 +60,8 @@ window.onclick = function(event) {
 document.getElementById("initBtn").addEventListener("click", ()=>{
     transition(0);
 })
+let qataIndex = dataLabels.indexOf("QATA");
+
 
 //localStorage console commands
 function clearStorage() {
@@ -164,10 +166,11 @@ window.addEventListener('keydown', function (keystroke) {
             document.getElementById('notes').classList.add("notesAnim")
             document.getElementById('notes').focus()
             notesToggled = true;
-            if (dataValues[14] == null) {
+
+            if (dataValues[qataIndex] == null) {
                 document.getElementById("notes").innerHTML = "";
             } else {
-                document.getElementById("notes").innerHTML = dataValues[14];
+                document.getElementById("notes").innerHTML = dataValues[qataIndex];
             }
         }
         else{
@@ -175,7 +178,7 @@ window.addEventListener('keydown', function (keystroke) {
 
             document.getElementById('notesPage').classList.add("notesPageAnimR")
             document.getElementById('notes').classList.add("notesAnimR")
-            dataValues[14] = document.getElementById("notes").value
+            dataValues[qataIndex] = document.getElementById("notes").value
             notesToggled = false;
         }
 
@@ -290,7 +293,7 @@ function generateMainPage(stage){
 
         //close notes box if it is open
         document.getElementById('notes').blur()
-        dataValues[14] = document.getElementById("notes").value
+        dataValues[qataIndex] = document.getElementById("notes").value
         document.getElementById("notes").classList.remove("notesAnim")
         document.getElementById("notes").classList.remove("notesAnimR")
         document.getElementById("notesPage").classList.remove("notesPageAnim")
@@ -382,7 +385,7 @@ function generateMainPage(stage){
                     textbox.style.height = "14vh";
                     textbox.style.paddingTop = "7px";
                     textbox.style.resize = "none";
-                    textbox.innerHTML = dataValues[14];
+                    textbox.innerHTML = dataValues[qataIndex];
                     container.appendChild(textbox)
                 }
                 else{
@@ -414,7 +417,6 @@ function generateMainPage(stage){
         for(i=0; i<settings.tele.length; i++){
             rowContent.push(settings.tele[i])
         }
-        rowContent.push(tempFix[0])
         
         console.log(rowContent.length)
         
@@ -563,9 +565,9 @@ function updateTimer(){
 
 function updateQr(){
     for(let i=0; i<dataValues.length; i++){
-        if(i == 8){ //scrappy code, should change later   
-        }
-        else if(typeof dataValues[i] == "boolean"){ //convert boolean to 0 or 1
+        // if(i == 8){ //scrappy code, should change later   
+        // }
+        if(typeof dataValues[i] == "boolean"){ //convert boolean to 0 or 1
             if(dataValues[i]){
                 dataValues[i] = 1;
             }
@@ -574,7 +576,10 @@ function updateQr(){
             }
         }
         else if(typeof dataValues[i] == "string"){ 
+            console.log("index: " + i);
+
             let textValue = document.getElementById(("str" + i)).value;
+
             textValue = textValue.replace(/\n/g, ' ').replace(/\,/g, ';');
             if (textValue.length == 0) {
                 dataValues[i] = "None";
@@ -825,7 +830,9 @@ function resetGame(){
     teamNum = null;
     notesToggled = false;
 
-    dataValues = [false, 0, 0, 0, 0, 0, 0, false, null, 0, 0, false, "", false, "", "", ""]
+    //dataValues = [false, 0, 0, 0, 0, 0, 0, false, null, 0, 0, false, "", false, "", "", ""]
+    dataValues = [false,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,false,0,0,0,"","","",""];
+    dataLabels = [ "Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", "High Cube", "Mid Cube", "Low Cube",  "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park","Defense Time", "Penalty Count", "Oof Time", "Climb QATA", "Link QATA", "QATA", "Drivetrain"];
 
     //clearing main page and generating the displaybar
     document.getElementById("mainPage").innerHTML = '';
