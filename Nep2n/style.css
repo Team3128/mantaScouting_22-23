@@ -455,15 +455,15 @@ body{
 }
 
 #c-chartContainer{
-    grid-row: 7/10;
-    grid-column: 2/6;
+    grid-row: 1;
+    grid-column: 6/7;
     z-index: 100;
 }
 #c-dataContainer{
     font-family: var(--font);
     text-align: center;
     grid-row: 2/8;
-    grid-column: 1/7;
+    grid-column: 1/6;
     overflow-y:scroll;
 }
 #c-dataContainer table {
@@ -480,7 +480,7 @@ body{
 #c-qataContainer{
     text-align: center;
     grid-row: 8/10;
-    grid-column: 1/7;
+    grid-column: 1/6;
     overflow-y:scroll;
 }
 #c-qataContainer table{
