@@ -8,7 +8,7 @@ Commands:
 
  
 Description:
-This is an electronic scouting system developed by FRC Team 3128, The Aluminum Narwhals, for use in the 2022 FRC Season "Rapid React". Download the files as a zip, open "index.html", and the webapp should open in your device's browser.
+This is an electronic scouting system developed by FRC Team 3128, The Aluminum Narwhals, for use in the 2023 FRC Season "Charged Up". Download the files as a zip, open "index.html", and the webapp should open in your device's browser.
 
 References:
 https://github.com/kazuhikoarase/qrcode-generator/blob/master/js/README.md
