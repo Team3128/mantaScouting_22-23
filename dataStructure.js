@@ -175,4 +175,10 @@ export class DataStructure {
         })
     }
 
+    changeWghtValues(newWeights){
+        for(var i=0;i<this.wghtValues.length;i++){
+            this.wghtValues[i] = parseInt(newWeights[i])
+          }
+    }
+
 }

@@ -21,6 +21,9 @@ export class AddTable{
     getTableBody(){
         return this.tableBody;
     }
+    createRow(){
+        return document.createElement("tr");
+    }
     
     addHeader(rowHeadNames){
         for(var i=0; i<rowHeadNames.length; i++){
@@ -40,6 +43,20 @@ export class AddTable{
         this.cell.appendChild(this.cellText);
         this.cellText.appendChild(this.cellP);
     }
+    addTextCell(data, row){
+        this.cell = document.createElement("td");
+        this.cellText = document.createElement("div");
+
+        this.txtBox = document.createElement("INPUT");
+        this.txtBox.setAttribute("type", "text");
+        this.txtBox.setAttribute("value", data);
+  
+        row.appendChild(this.cell);
+        this.cell.appendChild(this.cellText);
+        this.cellText.appendChild(this.txtBox);
+
+        return this.txtBox;
+    }
     addCells(rowHeadNames, data, row){
         //needs to take data and return row that is passed onto something else
         for(var i=0;i<rowHeadNames.length;i++){
@@ -54,6 +71,7 @@ export class AddTable{
             this.cellText.appendChild(this.cellP);
             //console.log(data[color[i]][j+1][headNames[g]])
             
-          }
+        }
+        return row;
     }
 }
