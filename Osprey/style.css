@@ -394,7 +394,7 @@ body{
 .afterTextBox{
     background-color: var(--highlightColor);
     border: 2px solid var(--highlightColor);
-    height: 10vh;
+    height: 6vh;
     border-radius: 0.5rem;
     color:var(--mainColor);
     font-size:1.25rem;
