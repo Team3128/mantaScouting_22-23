@@ -60,7 +60,7 @@ document.addEventListener("keydown", function(e) {
   }
 })
 
-pageChange.switchEvent("compare")
+pageChange.switchEvent("search")
 
 //=============== HOME ===============
 var matchData = []
@@ -124,8 +124,10 @@ console.log(matchData)
 let robotData = []
 onChildAdded(ref(db, dataStructure.getPath("Robots")), (snapshot)=>{
   robotData.push(snapshot.val())
+  
 })
 console.log(robotData)
+
 function search( team ){
   //if no team arg is passed, then search() will use the value in the search bar
   if(!team){
@@ -156,13 +158,13 @@ function search( team ){
       }
     }
   }
-  console.log(teamData)
+
   teams = undefined;
   // Image generation here wallim do it
 
   //General data: Purely quantitative data, no descriptions or words, only numbers and bools
-  var generalSearchData = new AddTable()
-  let generalLabels = ["Match", "Position", "Auto High", "Auto Low", "Auto Missed", "Taxi", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time"]
+  let generalSearchData = new AddTable()
+  let generalLabels = ["Match", "Position", "Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", "High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled"]
   generalSearchData.addHeader(generalLabels);
   //gettin each match
   var row = document.createElement("tr");
@@ -175,7 +177,7 @@ function search( team ){
 
    //Qualatative data (Qata): Only descriptions/words
    var qataSearchData = new AddTable()
-   let qataLabels = ["Match", "Position", "Scout", "Yeet", "QATA"]
+   let qataLabels = ["Match", "Position", "Scout", "Climb", "Park", "Defense Time", "Penalty Count", "Oof Time", "Climb QATA", "Link QATA", "QATA"]
    qataSearchData.addHeader(qataLabels);
    //gettin each match
    for(let i=0; i<teamData.length; i++){
@@ -187,26 +189,38 @@ function search( team ){
   //Misc data: Drivetrain, turret
 
   //chart/graph: Radar graph of most important data
-  let percentile;
-  onValue(ref(db, 'Events/Nep2nTest/Robots/'), (data)=>{
-    data = data.val()
-    percentile = new Percentile(data);
-    percentile.convertRawToObject().processObjectData()
-    percentile.sortPercentile();
-  })
+  //resetting canvas
+  document.getElementById("chartContainer").remove()
+  let canvas = document.createElement("canvas");
+  canvas.setAttribute("id", "chartContainer");
+  document.getElementById("search").appendChild(canvas);
+  //percentile work
+  let percentile = new Percentile(robotData);
+  percentile.convertRawToObject().processObjectData().sortPercentile()
+  //td = team data
+  let td = percentile.findAverageOfTeam(team)
+  //d = data, which gets put into the chart
+  let d = [
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Auto Points")], "Auto Points"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Tele Cubes")], "Tele Cubes"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Tele Cones")], "Tele Cones"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Tele Accuracy")], "Tele Accuracy"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Endgame Points")], "Endgame Points"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Defense Time")], "Defense Time")
+  ]
+  //chart setup
   const data = {
     labels: [
-      'Eating',
-      'Drinking',
-      'Sleeping',
-      'Designing',
-      'Coding',
-      'Cycling',
-      'Running'
+      'Auto points', 
+      'Tele cubes',
+      'Tele cones',
+      'Tele Accuracy',
+      'Endgame points',
+      'Defense time',
     ],
     datasets: [{
       label: ("Team " + team + " Percentiles"),
-      data: [65, 59, 90, 81, 56, 55, 40],
+      data: d,
       fill: true,
       backgroundColor: 'rgba(255, 99, 132, 0.2)',
       borderColor: 'rgb(255, 99, 132)',
@@ -216,7 +230,7 @@ function search( team ){
       pointHoverBorderColor: 'rgb(255, 99, 132)'
     }]
   };
-
+  //making the chart
   new Chart(
     document.getElementById("chartContainer"), {
       type: "radar", 

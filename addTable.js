@@ -21,6 +21,9 @@ export class AddTable{
     getTableBody(){
         return this.tableBody;
     }
+    createRow(){
+        return document.createElement("tr");
+    }
     
     addHeader(rowHeadNames){
         for(var i=0; i<rowHeadNames.length; i++){
@@ -54,6 +57,7 @@ export class AddTable{
             this.cellText.appendChild(this.cellP);
             //console.log(data[color[i]][j+1][headNames[g]])
             
-          }
+        }
+        return row;
     }
 }
