@@ -373,8 +373,7 @@ body{
     /* ^ above line is iffy, pls change later */
     grid-template-rows: repeat(10, 9.5vh);
     height: 95vh;
-    margin-top: 2.5vh;
-    margin-bottom: 2.5vh;
+    margin: 2.5vh;
     width: 100vw;
     overflow:hidden;
 

@@ -55,7 +55,7 @@ document.addEventListener("keydown", function(e) {
     }
     else if(pageChange.currentState == "compare"){
       e.preventDefault();
-      compgen();
+      comptext();
     }
   }
 })
@@ -169,7 +169,10 @@ function search( team ){
 
   for(let i=0; i<teamData.length; i++){
     //appending each match to a row
-    generalSearchData.getTableBody().appendChild(generalSearchData.addCells(generalLabels, teamData[i], generalSearchData.appendChild(row)))
+    var row = document.createElement("tr");
+    var name = generalSearchData.getTableBody();
+    name.appendChild(row);
+    generalLabels.addCells(generalLabels, teamData[i], row);
   }
    document.getElementById("dataContainer").appendChild(generalSearchData.table);
 
@@ -180,7 +183,10 @@ function search( team ){
    //gettin each match
    for(let i=0; i<teamData.length; i++){
      //appending each match to a row
-     qataSearchData.getTableBody().appendChild(qataSearchData.addCells(qataLabels, teamData[i], qataSearchData.createRow()))
+     var row = document.createElement("tr");
+      var name = qataSearchData.getTableBody();
+      name.appendChild(row);
+      qataSearchData.addCells(qataLabels, teamData[i], row);
    }
     document.getElementById("qataContainer").appendChild(qataSearchData.table);
 
@@ -238,7 +244,7 @@ onChildAdded(ref(db, dataStructure.getPath("Robots")), (snapshot)=>{
   cRobotData.push(snapshot.val())
 })
 console.log(cRobotData)
-function compgen(team){
+function comptext(team){
   if(!team){
     team = document.getElementById("c-searchbar").value;
     document.getElementById("c-searchbar").innerHTML = team;
@@ -295,9 +301,60 @@ function compgen(team){
   document.getElementById("c-qataContainer").appendChild(qatacomparedata.table);
 }
 
-//REAL COMPARE FUNCTION WOOOOOO
-// function compare(){
+// function compchart(team){
+//   if(!team){
+//     team = document.getElementById("c-searchbar").value;
+//     document.getElementById("c-searchbar").innerHTML = team;
+//   }
 
+//   let percentile;
+//   onValue(ref(db, 'Events/Nep2nTest/Robots/'), (data)=>{
+//     data = data.val()
+//     percentile = new Percentile(data);
+//     percentile.convertRawToObject().processObjectData()
+//     percentile.sortPercentile();
+//   })
+//   const data = {
+//     labels: [
+//       'Eating',
+//       'Drinking',
+//       'Sleeping',
+//       'Designing',
+//       'Coding',
+//       'Cycling',
+//       'Running'
+//     ],
+//     datasets: [{
+//       label: ("Team " + team + " Percentiles"),
+//       data: [65, 59, 90, 81, 56, 55, 40],
+//       fill: true,
+//       backgroundColor: 'rgba(255, 99, 132, 0.2)',
+//       borderColor: 'rgb(255, 99, 132)',
+//       pointBackgroundColor: 'rgb(255, 99, 132)',
+//       pointBorderColor: '#fff',
+//       pointHoverBackgroundColor: '#fff',
+//       pointHoverBorderColor: 'rgb(255, 99, 132)'
+//     }]
+//   };
+//   new Chart(
+//     document.getElementById("c-chartContainer"), {
+//       type: "radar", 
+//       data: data,
+//       options : {
+//         elements:{
+//           line: {
+//             borderWidth: 3
+//           }
+//         }
+//       }
+//     }
+//   )
+// }
+
+// //REAL COMPARE FUNCTION WOOOOOO
+// function compare(){
+//   comptext(document.getElementById("c-searchbar").value);
+//   compchart(document.getElementById("c-searchbar").value);
 // }
 //=============== RANKING ===============
 var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
