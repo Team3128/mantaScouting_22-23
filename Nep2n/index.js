@@ -448,19 +448,144 @@ var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
     displayRankings(data,rankHeadNames)
   }
   )
+
 //=============== PREDICT ===============
+// uses robotData object in Search 
+let avgFilterLabelsAuto = dataStructure.getFilterLabelsAuto();
+let avgFilterLabelsTele = dataStructure.getFilterLabelsTele();
+let autoPtValues = dataStructure.getAutoPtValues();
+let telePtValues = dataStructure.getTelePtValues();
 function predict() {
-  // get team numbers
-  let b1 = parseInt(document.getElementById("blue1").value);
-  let b2 = parseInt(document.getElementById("blue2").value);
-  let b3 = parseInt(document.getElementById("blue3").value);
-  let r1 = parseInt(document.getElementById("red1").value);
-  let r2 = parseInt(document.getElementById("red2").value);
-  let r3 = parseInt(document.getElementById("red3").value);
-  // set scores
+  // reset html elements
+  document.getElementById("blueVals").innerHTML = "";
+  document.getElementById("redVals").innerHTML = "";
+  // get team numbers and set up variables for team info
+  let blues = [
+    parseInt(document.getElementById("blue1").value),
+    parseInt(document.getElementById("blue2").value),
+    parseInt(document.getElementById("blue3").value)
+  ];
+  let reds = [
+    parseInt(document.getElementById("red1").value),
+    parseInt(document.getElementById("red2").value),
+    parseInt(document.getElementById("red3").value)
+  ];
+  let blueInfo = {0: {}, 1: {}, 2: {}};
+  let redInfo = {0: {}, 1: {}, 2: {}};
+  // set scores to start at 0
+  let blueScores = {"auto" : {}, "teleop" : {}, "total" : {}};
+  let redScores = {"auto" : {}, "teleop" : {}, "total" : {}};
   let blueScore = 0;
   let redScore = 0;
-  console.log(b1 + " " + b2 + " " + b3 + " " + r1 + " " + r2 + " " + r3);
+  // initialize tables with headers
+  const blueAllianceTable = new AddTable();
+  var blueTableBody = blueAllianceTable.getTableBody();
+  const redAllianceTable = new AddTable();
+  var redTableBody = redAllianceTable.getTableBody();
+  var blueRobotsHeader = dataStructure.createDataLabels("Blue Teams", ...blues);
+  var redRobotsHeader = dataStructure.createDataLabels("Red Teams", ...reds);
+  blueAllianceTable.addHeader(blueRobotsHeader);
+  redAllianceTable.addHeader(redRobotsHeader);
+  // vertical headers
+  var gameStageHeader = dataStructure.createDataLabels("Auto", "Teleop", "Total");
+  // getting data on each robot
+  for (let i = 0; i < robotData.length; i++) {
+    let team = Object.values(robotData[i])[0]["Team"];
+    for (let j = 0; j < blues.length; j++) {
+      if (blues[j] == team) blueInfo[j] = Object.values(robotData[i]);
+    }
+    for (let j = 0; j < reds.length; j++) {
+      if (reds[j] == team) redInfo[j] = Object.values(robotData[i]);
+    }
+  }
+  // calculating scores for each robot on each team
+  for (let i = 0; i < blues.length; i++) {
+    let currentRobotData = blueInfo[i];
+    let autoScore = 0.0;
+    let teleScore = 0.0;
+    if (currentRobotData.length == undefined) {
+      blueScores["auto"][i] = -1;
+      blueScores["teleop"][i] = -1;
+      blueScores["total"][i] = -1;
+      continue;
+    }
+
+    for (let j = 0; j < avgFilterLabelsAuto.length; j++) {
+      let avgVal = 0.0;
+      for (let k = 0; k < currentRobotData.length; k++) {
+        avgVal += currentRobotData[k][avgFilterLabelsAuto[j]] / currentRobotData.length;
+      }
+      autoScore += avgVal * autoPtValues[j];
+    }
+    for (let j = 0; j < avgFilterLabelsTele.length; j++) {
+      let avgVal = 0.0;
+      for (let k = 0; k < currentRobotData.length; k++) {
+        avgVal += currentRobotData[k][avgFilterLabelsTele[j]] / currentRobotData.length;
+      }
+      teleScore += avgVal * telePtValues[j];
+    }
+
+    blueScores["auto"][i] = autoScore;
+    blueScores["teleop"][i] = teleScore;
+    blueScores["total"][i] = autoScore + teleScore;
+    blueScore += autoScore + teleScore;
+  }
+  for (let i = 0; i < reds.length; i++) {
+    let currentRobotData = redInfo[i];
+    let autoScore = 0.0;
+    let teleScore = 0.0;
+    if (currentRobotData.length == undefined) {
+      redScores["auto"][i] = -1;
+      redScores["teleop"][i] = -1;
+      redScores["total"][i] = -1;
+      continue;
+    }
+
+    for (let j = 0; j < avgFilterLabelsAuto.length; j++) {
+      let avgVal = 0.0;
+      for (let k = 0; k < currentRobotData.length; k++) {
+        avgVal += currentRobotData[k][avgFilterLabelsAuto[j]] / currentRobotData.length;
+      }
+      autoScore += avgVal * autoPtValues[j];
+    }
+    for (let j = 0; j < avgFilterLabelsTele.length; j++) {
+      let avgVal = 0.0;
+      for (let k = 0; k < currentRobotData.length; k++) {
+        avgVal += currentRobotData[k][avgFilterLabelsTele[j]] / currentRobotData.length;
+      }
+      teleScore += avgVal * telePtValues[j];
+    }
+
+    redScores["auto"][i] = autoScore;
+    redScores["teleop"][i] = teleScore;
+    redScores["total"][i] = autoScore + teleScore;
+    redScore += autoScore + teleScore;
+  }
+  for (let i = 0; i < gameStageHeader.length; i++) {
+    var blueRow = document.createElement("tr");
+    var redRow = document.createElement("tr");
+    blueTableBody.appendChild(blueRow);
+    redTableBody.appendChild(redRow);
+    // add vertical headers
+    blueAllianceTable.addCell(gameStageHeader[i], blueRow, true);
+    redAllianceTable.addCell(gameStageHeader[i], redRow, true);
+    for (let j = 0; j < 3; j++) {
+      console.log(blueScores[gameStageHeader[i].toLowerCase()][j])
+      let blueScoreVal = blueScores[gameStageHeader[i].toLowerCase()][j].toFixed(1);
+      if (blueScoreVal == -1) {
+        blueScoreVal = "NA"
+      }
+      let redScoreVal = redScores[gameStageHeader[i].toLowerCase()][j].toFixed(1);
+      if (redScoreVal == -1) {
+        redScoreVal = "NA"
+      }
+      blueAllianceTable.addCell(blueScoreVal, blueRow);
+      redAllianceTable.addCell(redScoreVal, redRow);
+    }
+  }
+  document.getElementById("blueVals").appendChild(blueAllianceTable.getTable());
+  document.getElementById("redVals").appendChild(redAllianceTable.getTable());
+  document.getElementById("points").innerHTML = "Blue: " + blueScore.toFixed(1) + "<br>Red: " + redScore.toFixed(1);
   // set winner
   let w = document.getElementById("winner");
   if (blueScore > redScore) {
