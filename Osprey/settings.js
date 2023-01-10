@@ -5,7 +5,7 @@ let settings = {
   "auto": [
     //cube cone buttons
     {
-      "label": "High ❒",
+      "label": "A High ❒",
       "trigger": "s", 
       "columnStart": 1,
       "columnEnd": 2,
@@ -15,84 +15,104 @@ let settings = {
       "writeType": "int"
     },
     {
-      "label": "High △",
+      "label": "A High △",
       "trigger": "j", 
       "columnStart": 2,
       "columnEnd": 3,
       "rowStart": 1,
       "rowEnd": 2,
+      "writeLoc": 4,
+      "writeType": "int"
+    },
+    {
+      "label": "A Mid ❒",
+      "trigger": "d", 
+      "columnStart": 1,
+      "columnEnd": 2,
+      "rowStart": 2,
+      "rowEnd": 3,
       "writeLoc": 2,
       "writeType": "int"
     },
     {
-      "label": "Mid ❒",
-      "trigger": "d", 
-      "columnStart": 1,
-      "columnEnd": 2,
+      "label": "A Mid △",
+      "trigger": "k", 
+      "columnStart": 2,
+      "columnEnd": 3,
       "rowStart": 2,
       "rowEnd": 3,
       "writeLoc": 5,
       "writeType": "int"
     },
     {
-      "label": "Mid △",
-      "trigger": "k", 
-      "columnStart": 2,
-      "columnEnd": 3,
-      "rowStart": 2,
-      "rowEnd": 3,
-      "writeLoc": 6,
-      "writeType": "int"
-    },
-    {
-      "label": "Low ❒",
+      "label": "A Low ❒",
       "trigger": "f", 
       "columnStart": 1,
       "columnEnd": 2,
       "rowStart": 3,
       "rowEnd": 4,
-      "writeLoc": 7,
+      "writeLoc": 3,
       "writeType": "int"
     },
     {
-      "label": "Low △",
+      "label": "A Low △",
       "trigger": "l", 
       "columnStart": 2,
       "columnEnd": 3,
       "rowStart": 3,
       "rowEnd": 4,
-      "writeLoc": 8,
+      "writeLoc": 6,
       "writeType": "int"
     },
     //cube cone buttons end
     {
-      "label": "fumble",
+      "label": "A fumble",
       "trigger": "n", 
       "columnStart": 3,
       "columnEnd": 5,
       "rowStart": 1,
       "rowEnd": 2,
-      "writeLoc": 3,
+      "writeLoc": 7,
       "writeType": "int"
     },
     {
-      "label": "fuck you(climb thing)",
+      "label": "A fuck you(climb time)",
       "trigger": "m", 
       "columnStart": 3,
       "columnEnd": 5,
       "rowStart": 2,
       "rowEnd": 3,
-      "writeLoc": 4,
+      "writeLoc": 8,
+      "writeType": "inc"
+    },
+    {
+      "label": "Oof",
+      "trigger": "h", 
+      "columnStart": 4,
+      "columnEnd": 5,
+      "rowStart": 3,
+      "rowEnd": 5,
+      "writeLoc": 20,
       "writeType": "inc"
     },
     {
       "label": "Moblility",
       "trigger": "h", 
       "columnStart": 3,
-      "columnEnd": 5,
+      "columnEnd": 4,
       "rowStart": 3,
       "rowEnd": 5,
       "writeLoc": 0,
+      "writeType": "bool"
+    },
+    {
+      "label": "Defene",
+      "trigger": "a", 
+      "columnStart": 1,
+      "columnEnd": 3,
+      "rowStart": 4,
+      "rowEnd": 5,
+      "writeLoc": 18,
       "writeType": "bool"
     }
   ],
@@ -104,7 +124,7 @@ let settings = {
   "tele":[
     //cube cone buttons
     {
-      "label": "High ❒",
+      "label": "T High ❒",
       "trigger": "s", 
       "columnStart": 1,
       "columnEnd": 2,
@@ -114,47 +134,47 @@ let settings = {
       "writeType": "int"
     },
     {
-      "label": "High △",
+      "label": "T High △",
       "trigger": "j", 
       "columnStart": 2,
       "columnEnd": 3,
       "rowStart": 1,
       "rowEnd": 2,
-      "writeLoc": 10,
+      "writeLoc": 12,
       "writeType": "int"
     },
     {
-      "label": "Mid ❒",
+      "label": "T Mid ❒",
       "trigger": "d", 
       "columnStart": 1,
       "columnEnd": 2,
       "rowStart": 2,
       "rowEnd": 3,
-      "writeLoc": 11,
+      "writeLoc": 10,
       "writeType": "int"
     },
     {
-      "label": "Mid △",
+      "label": "T Mid △",
       "trigger": "k", 
       "columnStart": 2,
       "columnEnd": 3,
       "rowStart": 2,
       "rowEnd": 3,
-      "writeLoc": 12,
+      "writeLoc": 13,
       "writeType": "int"
     },
     {
-      "label": "Low ❒",
+      "label": "T Low ❒",
       "trigger": "f", 
       "columnStart": 1,
       "columnEnd": 2,
       "rowStart": 3,
       "rowEnd": 4,
-      "writeLoc": 13,
+      "writeLoc": 11,
       "writeType": "int"
     },
     {
-      "label": "Low △",
+      "label": "T Low △",
       "trigger": "l", 
       "columnStart": 2,
       "columnEnd": 3,
@@ -175,66 +195,77 @@ let settings = {
       "writeType": "int"
     },
     {
-      "label": "fuck you(climb thing)",
+      "label": "Penalty",
       "trigger": "m", 
       "columnStart": 3,
       "columnEnd": 5,
       "rowStart": 2,
       "rowEnd": 3,
-      "writeLoc": 16,
-      "writeType": "inc"
+      "writeLoc": 19,
+      "writeType": "int"
     },
     {
-      "label": "Moblility",
+      "label": "Park",
       "trigger": "h", 
       "columnStart": 3,
-      "columnEnd": 5,
+      "columnEnd": 4,
       "rowStart": 3,
       "rowEnd": 5,
       "writeLoc": 17,
+      "writeType": "bool"
+    },
+    {
+      "label": "Oof",
+      "trigger": "h", 
+      "columnStart": 4,
+      "columnEnd": 5,
+      "rowStart": 3,
+      "rowEnd": 5,
+      "writeLoc": 20,
+      "writeType": "inc"
+    },
+    {
+      "label": "Defene",
+      "trigger": "a", 
+      "columnStart": 1,
+      "columnEnd": 3,
+      "rowStart": 4,
+      "rowEnd": 5,
+      "writeLoc": 18,
       "writeType": "bool"
     }
   ], 
 
   "after":[
     {
-      "label":"Climb Level",
-      "writeLoc": 8,
+      "label":"Climbed?",
+      "writeLoc": 16,
       "writeType": "cyc",
-      "cycOptions": ["N","L", "M", "H", "T"],
-      "writeCycOptions": 5
+      "cycOptions": ["NA","D","DE(ez nuts)" ],
+      "writeCycOptions": 3
     },
-    {
-      "label":"Penalty",
-      "writeLoc": 11,
-      "writeType": "bool",
-    }, 
-    {
-      "label":"Oof", 
-      "writeLoc": 13,
-      "writeType": "bool"
-    },
+     
     {
       "label": "Drive Train",
-      "writeLoc": 15,
+      "writeLoc": 24,
       "writeType": "str",
       "placeholder": "e.g. tank, swerve"
     },
     {
-      "label": "Shooting Distance",
-      "writeLoc": 12,
+      "label": "Climbing Capabilities?",
+      "writeLoc": 21,
       "writeType": "str",
-      "placeholder": "e.g. tarmac, bumper"
+      "placeholder": "e.g. write about climb, can balance?, very slow?"
     },
     {
-      "label": "Shooter", 
-      "writeLoc": 16, 
+      "label": "Links?", 
+      "writeLoc": 22, 
       "writeType": "str",
-      "placeholder": "e.g. hood, turret, other"
+      "placeholder": "e.g. arm, suction, other"
     },
     {
-      "label": "Other Qata",
-      "writeLoc": 14,
+      "label": "QATA",
+      "writeLoc": 23,
       "writeType": "str",
       "placeholder": "e.g. defence, penalties, speed"
     }
@@ -243,9 +274,11 @@ let settings = {
   
 }
 
-let dataValues = [false, 0, 0, 0, 0, 0, 0, false, null, 0, 0, false, "", false, "", "", ""];
-let dataLabels = ["Taxi", "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Level", "Climb Time", "Defence Time", "Penalty", "Yeet", "Oof", "QATA", "Drivetrain Type", "Shooter Type"];
-
+//let dataValues = [false, 0, 0, 0, 0, 0, 0, false, null, 0, 0, false, "", false, "", "", ""];
+//let dataLabels = ["Taxi", "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Level", "Climb Time", "Defence Time", "Penalty", "Yeet", "Oof", "QATA", "Drivetrain Type", "Shooter Type"];
+//YUBO help me
+let dataValues = [false,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,false,0,0,0,"","","",""];
+let dataLabels = [ "Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", "High Cube", "Mid Cube", "Low Cube",  "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park","Defense Time", "Penalty Count", "Oof Time", "Climb QATA", "Link QATA", "QATA", "Drivetrain"];
 let tempFix = [{
   "label": "Attempted Climb",
   "writeLoc": 7,
