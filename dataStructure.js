@@ -38,8 +38,35 @@ export class DataStructure {
             "Penalty Count",
             "Oof Time"
         ]
+        this.avgFilterLabelsAuto = [
+            "Mobility",
+            "Auto High Cube",
+            "Auto Mid Cube",
+            "Auto Low Cube",
+            "Auto High Cone",
+            "Auto Mid Cone",
+            "Auto Low Cone",
+            "Auto Fumbled",
+            "Auto Climb"
+        ]
+        this.avgFilterLabelsTele = [
+            "High Cube",
+            "Mid Cube",
+            "Low Cube",
+            "High Cone",
+            "Mid Cone",
+            "Low Cone",
+            "Fumbled",
+            "Climb", 
+            "Park", 
+            "Defense Time",
+            "Penalty Count",
+            "Oof Time"
+        ]
         this.wghtValues = [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0];
         this.ptValues = [3, 6, 4, 3, 6, 4, 3, 0, 1, 5, 3, 2, 5, 3, 2, 0, 1, 2, 0, 0, 0];
+        this.autoPtValues = [3, 6, 4, 3, 6, 4, 3, 0, 1];
+        this.telePtValues = [5, 3, 2, 5, 3, 2, 0, 1, 2, 0, 0, 0];
         this.storedRobotsTotalPtAvg = {}
         this.storedRobotsAvgPtVals = {}
 
@@ -95,11 +122,26 @@ export class DataStructure {
     setDataValues(i, val) {
         this.dataValues[i] = val;
     }
+    getFilterLabels() {
+        return this.avgFilterLabels;
+    }
+    getFilterLabelsAuto() {
+        return this.avgFilterLabelsAuto;
+    }
+    getFilterLabelsTele() {
+        return this.avgFilterLabelsTele;
+    }
     getWghtValues() {
         return this.wghtValues;
     }
     getPtValues() {
         return this.ptValues;
+    }
+    getAutoPtValues() {
+        return this.autoPtValues;
+    }
+    getTelePtValues() {
+        return this.telePtValues;
     }
     getStoredRobotsTotalPtAvg(){
         return this.storedRobotsTotalPtAvg;

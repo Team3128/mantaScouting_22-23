@@ -21,10 +21,6 @@ export class AddTable{
     getTableBody(){
         return this.tableBody;
     }
-    createRow(){
-        return document.createElement("tr");
-    }
-    
     addHeader(rowHeadNames){
         for(var i=0; i<rowHeadNames.length; i++){
             const headCell = document.createElement("th");
@@ -32,8 +28,9 @@ export class AddTable{
             headCell.innerHTML = rowHeadNames[i]
         }
     }
-    addCell(data, row){
+    addCell(data, row, header=false){
         this.cell = document.createElement("td");
+        if (header) this.cell = document.createElement("th");
         this.cellText = document.createElement("div");
         this.cellP = document.createElement("p");
 
