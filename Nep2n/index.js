@@ -364,9 +364,7 @@ var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
   var rankTableBody = rankTable.getTableBody();
   document.getElementById("rank-container").appendChild(rankTable.getTable());
 
-  setPath = dataStructure.getPath("Robots");
-  onValue(ref(db, setPath), (snapshot)=>{
-    const data = snapshot.val()
+  function displayRankings(data, rankHeadNames){
     var robotNames = Object.keys(data)
     var dataLabelsToCalc = rankHeadNames.splice(3);
     //for loop over each robot
@@ -395,14 +393,19 @@ var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
           rankTable.addCell(storedRobotsTotalPtAvg[allRobotPts[f]], row);
 
           //adds avg data to the row, then is displayed on the table
-
+          
           var robotAvgVals = storedRobotsAvgPtVals[allRobotPts[f]]
           rankTable.addCells(dataLabelsToCalc, robotAvgVals, row);
         }
       }
       rank_counter+=1
     }
+  }
 
+  setPath = dataStructure.getPath("Robots");
+  onValue(ref(db, setPath), (snapshot)=>{
+    const data = snapshot.val()
+    displayRankings(data,rankHeadNames)
   }
   )
 //=============== PREDICT ===============
@@ -428,3 +431,78 @@ function predict() {
     w.innerHTML = "TIE";
   }
 }
+//=============== SETTINGS ===============
+var settingWghtHeadNames = dataStructure.createDataLabels("Mobility",
+"Auto High Cube",
+"Auto Mid Cube",
+"Auto Low Cube",
+"Auto High Cone",
+"Auto Mid Cone",
+"Auto Low Cone",
+"Auto Fumbled",
+"Auto Climb", 
+"High Cube",
+"Mid Cube",
+"Low Cube",
+"High Cone",
+"Mid Cone",
+"Low Cone",
+"Fumbled",
+"Climb", 
+"Park", 
+"Defense Time",
+"Penalty Count",
+"Oof Time");
+
+//general table generation
+const settingWghtTable = new AddTable();
+settingWghtTable.addHeader(settingWghtHeadNames);
+var settingWghtTableBody = settingWghtTable.getTableBody();
+document.getElementById("settings-wght-container").appendChild(settingWghtTable.getTable());
+
+var row = document.createElement("tr");
+settingWghtTableBody.appendChild(row);
+var txtBoxes = [];
+
+for(var i=0;i<settingWghtHeadNames.length;i++){
+  var weights = dataStructure.getWghtValues()
+  txtBoxes.push(settingWghtTable.addTextCell(weights[i], row));
+}
+function getNewWeights(){
+  var newWeights = [];
+  for(var i=0;i<settingWghtHeadNames.length;i++){
+    newWeights.push(txtBoxes[i].value)
+  }
+  dataStructure.changeWghtValues(newWeights)
+  var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
+"Mobility",
+"Auto High Cube",
+"Auto Mid Cube",
+"Auto Low Cube",
+"Auto High Cone",
+"Auto Mid Cone",
+"Auto Low Cone",
+"Auto Fumbled",
+"Auto Climb", 
+"High Cube",
+"Mid Cube",
+"Low Cube",
+"High Cone",
+"Mid Cone",
+"Low Cone",
+"Fumbled",
+"Climb", 
+"Park", 
+"Defense Time",
+"Penalty Count",
+"Oof Time");
+  setPath = dataStructure.getPath("Robots");
+  get(ref(db, setPath)).then((snapshot) => {
+    var data = snapshot.val()
+    displayRankings(data,rankHeadNames)
+  })
+}
+document.getElementById("wghtBtn").addEventListener("click", getNewWeights);
+
+
+
