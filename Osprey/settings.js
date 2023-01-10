@@ -241,7 +241,7 @@ let settings = {
       "label":"Climbed?",
       "writeLoc": 16,
       "writeType": "cyc",
-      "cycOptions": ["NA","D","DE(ez nuts)" ],
+      "cycOptions": [0, 6, 10 ],
       "writeCycOptions": 3
     },
      
@@ -277,10 +277,12 @@ let settings = {
 //let dataValues = [false, 0, 0, 0, 0, 0, 0, false, null, 0, 0, false, "", false, "", "", ""];
 //let dataLabels = ["Taxi", "Auto High", "Auto Low", "Auto Missed", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Level", "Climb Time", "Defence Time", "Penalty", "Yeet", "Oof", "QATA", "Drivetrain Type", "Shooter Type"];
 //YUBO help me
+//                0     1 2 3 4 5 6 7 8 9 1011121314151617    18192021 22 23 24
 let dataValues = [false,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,false,0,0,0,"","","",""];
 let dataLabels = [ "Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", "High Cube", "Mid Cube", "Low Cube",  "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park","Defense Time", "Penalty Count", "Oof Time", "Climb QATA", "Link QATA", "QATA", "Drivetrain"];
-let tempFix = [{
-  "label": "Attempted Climb",
-  "writeLoc": 7,
-  "writeType": "bool"
-}]
+
+// let tempFix = [{
+//   "label": "Attempted Climb",
+//   "writeLoc": 7,
+//   "writeType": "bool"
+// }]
