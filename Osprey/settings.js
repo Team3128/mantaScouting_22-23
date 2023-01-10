@@ -97,7 +97,7 @@ let settings = {
     },
     {
       "label": "Moblility",
-      "trigger": "h", 
+      "trigger": "o", 
       "columnStart": 3,
       "columnEnd": 4,
       "rowStart": 3,
@@ -216,7 +216,7 @@ let settings = {
     },
     {
       "label": "Oof",
-      "trigger": "h", 
+      "trigger": "o", 
       "columnStart": 4,
       "columnEnd": 5,
       "rowStart": 3,

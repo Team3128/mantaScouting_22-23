@@ -394,7 +394,7 @@ body{
 .afterTextBox{
     background-color: var(--highlightColor);
     border: 2px solid var(--highlightColor);
-    height: 6vh;
+    height: 10vh;
     border-radius: 0.5rem;
     color:var(--mainColor);
     font-size:1.25rem;
@@ -418,8 +418,9 @@ body{
 }
 
 #mainTable{
+    
     border-collapse: collapse;
-    font-size: 1rem;
+    font-size: 0.6rem;
     font-family: "Roboto Mono", monospace;
     
     width: 70%;
