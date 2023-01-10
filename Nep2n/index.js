@@ -60,7 +60,7 @@ document.addEventListener("keydown", function(e) {
   }
 })
 
-pageChange.switchEvent("compare")
+pageChange.switchEvent("predict")
 
 //=============== HOME ===============
 var matchData = []
@@ -510,20 +510,12 @@ function predict() {
       continue;
     }
 
-    for (let j = 0; j < avgFilterLabelsAuto.length; j++) {
-      let avgVal = 0.0;
-      for (let k = 0; k < currentRobotData.length; k++) {
-        avgVal += currentRobotData[k][avgFilterLabelsAuto[j]] / currentRobotData.length;
-      }
-      autoScore += avgVal * autoPtValues[j];
-    }
-    for (let j = 0; j < avgFilterLabelsTele.length; j++) {
-      let avgVal = 0.0;
-      for (let k = 0; k < currentRobotData.length; k++) {
-        avgVal += currentRobotData[k][avgFilterLabelsTele[j]] / currentRobotData.length;
-      }
-      teleScore += avgVal * telePtValues[j];
-    }
+    autoScore += dataStructure.calcAutoPts(currentRobotData)
+
+    teleScore += dataStructure.calcTelePts(currentRobotData)
+
+    console.log(dataStructure.storedRobotAutoPts)
+    console.log(dataStructure.storedRobotTelePts)
 
     blueScores["auto"][i] = autoScore;
     blueScores["teleop"][i] = teleScore;

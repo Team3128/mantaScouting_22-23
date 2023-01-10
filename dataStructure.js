@@ -69,8 +69,11 @@ export class DataStructure {
         this.telePtValues = [5, 3, 2, 5, 3, 2, 0, 1, 2, 0, 0, 0];
         this.storedRobotsTotalPtAvg = {}
         this.storedRobotsAvgPtVals = {}
+        this.storedRobotAutoPts = {}
+        this.storedRobotTelePts = {}
 
-        this.pitscoutLabels = ["Team", "Scout Name", "Drivetrain", "Robot Weight", "Number of Motors", "Motor Type", "Vision", "Auto", "Auto Climb", "Endgame Climb", "Piece Type", "Manipulator", "Aluminum Assistance", "Miscellaneous"];
+        this.pitscoutLabels = ["Timestamp","Team", "Scout Name", "Drivetrain", "Robot Weight", "Number of Motors", "Motor Type", "Vision", "Auto", "Auto Climb", "Endgame Climb", "Piece Type", "Manipulator", "Aluminum Assistance", "Miscellaneous"];
+        this.imageLabels = ['Timestamp', 'Team', 'Image of Robot'];
 
         this.firebasePath = "Events/Nep2nTest/";
         this.firebaseConfig = {
@@ -223,4 +226,30 @@ export class DataStructure {
           }
     }
 
+    calcAutoPts(currentRobotData){
+        let autoScore = 0.0
+        for (let j = 0; j < this.avgFilterLabelsAuto.length; j++) {
+            let avgVal = 0.0;
+            for (let k = 0; k < currentRobotData.length; k++) {
+              avgVal += currentRobotData[k][this.avgFilterLabelsAuto[j]] / currentRobotData.length;
+            }
+            autoScore += avgVal * this.autoPtValues[j];
+          }
+        this.storedRobotAutoPts[currentRobotData[0]["Team"]] = autoScore.toFixed(1)
+        return autoScore
+    }
+
+    calcTelePts(currentRobotData){
+        let teleScore = 0.0
+        for (let j = 0; j < this.avgFilterLabelsTele.length; j++) {
+            let avgVal = 0.0;
+            for (let k = 0; k < currentRobotData.length; k++) {
+              avgVal += currentRobotData[k][this.avgFilterLabelsTele[j]] / currentRobotData.length;
+            }
+            teleScore += avgVal * this.telePtValues[j];
+          }
+        this.storedRobotTelePts[currentRobotData[0]["Team"]] = teleScore.toFixed(1)
+        return teleScore
+    }
+    
 }
