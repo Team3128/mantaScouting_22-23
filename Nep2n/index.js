@@ -60,7 +60,7 @@ document.addEventListener("keydown", function(e) {
   }
 })
 
-pageChange.switchEvent("search")
+pageChange.switchEvent("compare")
 
 //=============== HOME ===============
 var matchData = []
@@ -258,6 +258,8 @@ onChildAdded(ref(db, dataStructure.getPath("Robots")), (snapshot)=>{
   cRobotData.push(snapshot.val())
 })
 console.log(cRobotData)
+
+//generates stab data for team
 function comptext(team){
   if(!team){
     team = document.getElementById("c-searchbar").value;
@@ -315,6 +317,8 @@ function comptext(team){
   document.getElementById("c-qataContainer").appendChild(qatacomparedata.table);
 }
 
+
+//chart function -- generates radar chart
 function compchart(team){
   if(!team){
     team = document.getElementById("c-searchbar").value;
@@ -330,13 +334,12 @@ function compchart(team){
   })
   const data = {
     labels: [
-      'Eating',
-      'Drinking',
-      'Sleeping',
-      'Designing',
-      'Coding',
-      'Cycling',
-      'Running'
+      "Auto Total",
+      "Tele Total",
+      "Climb Total",
+      "Defense Time",
+      "Fumbled Total",
+      "Penalty Total"
     ],
     datasets: [{
       label: ("Team " + team + " Percentiles"),
@@ -368,6 +371,8 @@ function compchart(team){
 //REAL COMPARE FUNCTION WOOOOOO
 function compare(){
   comptext(document.getElementById("c-searchbar").value);
+
+
   compchart(document.getElementById("c-searchbar").value);
 }
 //=============== RANKING ===============
