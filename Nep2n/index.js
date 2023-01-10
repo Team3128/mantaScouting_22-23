@@ -53,10 +53,14 @@ document.addEventListener("keydown", function(e) {
       e.preventDefault();
       predict();
     }
+    else if(pageChange.currentState == "compare"){
+      e.preventDefault();
+      compgen();
+    }
   }
 })
 
-pageChange.switchEvent("home")
+pageChange.switchEvent("search")
 
 //=============== HOME ===============
 var matchData = []
@@ -120,8 +124,10 @@ console.log(matchData)
 let robotData = []
 onChildAdded(ref(db, dataStructure.getPath("Robots")), (snapshot)=>{
   robotData.push(snapshot.val())
+  
 })
 console.log(robotData)
+
 function search( team ){
   //if no team arg is passed, then search() will use the value in the search bar
   if(!team){
@@ -152,24 +158,26 @@ function search( team ){
       }
     }
   }
-  console.log(teamData)
+
   teams = undefined;
   // Image generation here wallim do it
 
   //General data: Purely quantitative data, no descriptions or words, only numbers and bools
-  var generalSearchData = new AddTable()
-  let generalLabels = ["Match", "Position", "Auto High", "Auto Low", "Auto Missed", "Taxi", "Tele High", "Tele Low", "Tele Missed", "Attempted Climb", "Climb Points", "Climb Time", "Defense Time", "Penalty", "Oof Time"]
+  let generalSearchData = new AddTable()
+  let generalLabels = ["Match", "Position", "Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", "High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled"]
   generalSearchData.addHeader(generalLabels);
   //gettin each match
+  var row = document.createElement("tr");
+
   for(let i=0; i<teamData.length; i++){
     //appending each match to a row
-    generalSearchData.getTableBody().appendChild(generalSearchData.addCells(generalLabels, teamData[i], generalSearchData.createRow()))
+    generalSearchData.getTableBody().appendChild(generalSearchData.addCells(generalLabels, teamData[i], generalSearchData.appendChild(row)))
   }
    document.getElementById("dataContainer").appendChild(generalSearchData.table);
 
    //Qualatative data (Qata): Only descriptions/words
    var qataSearchData = new AddTable()
-   let qataLabels = ["Match", "Position", "Scout", "Yeet", "QATA"]
+   let qataLabels = ["Match", "Position", "Scout", "Climb", "Park", "Defense Time", "Penalty Count", "Oof Time", "Climb QATA", "Link QATA", "QATA"]
    qataSearchData.addHeader(qataLabels);
    //gettin each match
    for(let i=0; i<teamData.length; i++){
@@ -181,26 +189,38 @@ function search( team ){
   //Misc data: Drivetrain, turret
 
   //chart/graph: Radar graph of most important data
-  let percentile;
-  onValue(ref(db, 'Events/Nep2nTest/Robots/'), (data)=>{
-    data = data.val()
-    percentile = new Percentile(data);
-    percentile.convertRawToObject().processObjectData()
-    percentile.sortPercentile();
-  })
+  //resetting canvas
+  document.getElementById("chartContainer").remove()
+  let canvas = document.createElement("canvas");
+  canvas.setAttribute("id", "chartContainer");
+  document.getElementById("search").appendChild(canvas);
+  //percentile work
+  let percentile = new Percentile(robotData);
+  percentile.convertRawToObject().processObjectData().sortPercentile()
+  //td = team data
+  let td = percentile.findAverageOfTeam(team)
+  //d = data, which gets put into the chart
+  let d = [
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Auto Points")], "Auto Points"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Tele Cubes")], "Tele Cubes"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Tele Cones")], "Tele Cones"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Tele Accuracy")], "Tele Accuracy"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Endgame Points")], "Endgame Points"),
+    percentile.findPercentileOf(td[percentile.percentileObject[0].indexOf("Defense Time")], "Defense Time")
+  ]
+  //chart setup
   const data = {
     labels: [
-      'Eating',
-      'Drinking',
-      'Sleeping',
-      'Designing',
-      'Coding',
-      'Cycling',
-      'Running'
+      'Auto points', 
+      'Tele cubes',
+      'Tele cones',
+      'Tele Accuracy',
+      'Endgame points',
+      'Defense time',
     ],
     datasets: [{
       label: ("Team " + team + " Percentiles"),
-      data: [65, 59, 90, 81, 56, 55, 40],
+      data: d,
       fill: true,
       backgroundColor: 'rgba(255, 99, 132, 0.2)',
       borderColor: 'rgb(255, 99, 132)',
@@ -210,7 +230,7 @@ function search( team ){
       pointHoverBorderColor: 'rgb(255, 99, 132)'
     }]
   };
-
+  //making the chart
   new Chart(
     document.getElementById("chartContainer"), {
       type: "radar", 
@@ -224,117 +244,75 @@ function search( team ){
       }
     }
   )
-
-  //=============== COMPARE ===============
-  let cRobotData = []
+  
+}
+//=============== COMPARE ===============
+let cRobotData = []
 onChildAdded(ref(db, dataStructure.getPath("Robots")), (snapshot)=>{
   cRobotData.push(snapshot.val())
 })
 console.log(cRobotData)
-
-//func starts here
-function compare(team1, team2){
-  //args for compare
-  if(!team1){
-    team1 = document.getElementById("1-searchbar").value;
-    document.getElementById("1-searchbar").innerHTML = team1;
+function compgen(team){
+  if(!team){
+    team = document.getElementById("c-searchbar").value;
+    document.getElementById("c-searchbar").innerHTML = team;
   }
-  if(!team2){
-    team2 = document.getElementById("2-searchbar").value;
-    document.getElementById("2-searchbar").innerHTML = team2;
-  }
-  //move searchbar from default
-  if(document.getElementById("1-barContainer").classList.contains("default")){
-    document.getElementById("1-barContainer").classList.remove("default")
-    document.getElementById("1-barContainer").classList.add("active")
-  }
-  if(document.getElementById("2-barContainer").classList.contains("default")){
-    document.getElementById("2-barContainer").classList.remove("default")
-    document.getElementById("2-barContainer").classList.add("active")
+  if(document.getElementById("c-barContainer").classList.contains("default")){
+    document.getElementById("c-barContainer").classList.remove("default")
+    document.getElementById("c-barContainer").classList.add("active")
   }
 
-  //does it exist? yoinked from search
   let teams = [];
-  let teamDataOne = [];
-  let teamDataTwo = [];
+  let teamData = [];
   for(let i = 0; i < cRobotData.length; i++){
-    teams.push(Object.values(cRobotData[i])[0]["Team"])
+    teams.push(Object.values(robotData[i])[0]["Team"])
   }
-  //t1
-  if(!teams.includes(team1)){
-    alert("Team 1 does not exist in databse")
+  if(!teams.includes(team)){
+    alert("Team does not exist in databse")
     return;
   }
   else{
     for(let i = 0; i < cRobotData.length; i++){
-      if(team1 == Object.values(cRobotData[i])[0]["Team"]){
-        teamDataOne = Object.values(cRobotData[i])
+      if(team == Object.values(cRobotData[i])[0]["Team"]){
+        teamData = Object.values(cRobotData[i])
       }
     }
   }
-
-  //t2
-  if(!teams.includes(team2)){
-    alert("Team 2 does not exist in databse")
-    return;
-  }
-  else{
-    for(let i = 0; i < cRobotData.length; i++){
-      if(team2 == Object.values(cRobotData[i])[0]["Team"]){
-        teamDataTwo = Object.values(cRobotData[i])
-      }
-    }
-  }
-
-  console.log(teamDataOne);
-  console.log(teamDataTwo);
+  console.log(teamData)
   teams = undefined;
 
-  //gen data
-  //t1
-  var genDataOne = new AddTable()
-  let genLabels = ["Match", "Team", "Position", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", "High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park", "Defense Time", "Penalty Count", "Oof Time"]
-  genDataOne.addHeader(genLabels);
+  var gencomparedata = new AddTable()
+  let genlabels = ["Match", "Team", "Position", "Scout", 
+  "Mobility", "Auto High Cube", "Auto Mid Cube", "Auto Low Cube", "Auto High Cone", "Auto Mid Cone", "Auto Low Cone", "Auto Fumbled", "Auto Climb", 
+  "High Cube", "Mid Cube", "Low Cube", "High Cone", "Mid Cone", "Low Cone", "Fumbled", "Climb", "Park",
+  "Defense Time", "Penalty Count", "Oof Time"]
+  gencomparedata.addHeader(genlabels);
+  
+  for(let i = 0; i < teamData.length; i++){
+    var row = document.createElement("tr");
+    var name = gencomparedata.getTableBody();
+    name.appendChild(row);
+    gencomparedata.addCells(genlabels, teamData[i], row);
+  }  
+  document.getElementById("c-dataContainer").appendChild(gencomparedata.table);
 
-  //pull match
-  for(let i = 0; i<teamDataOne.length; i++){
-    genDataOne.getTableBody().appendChild(genDataOne.addCells(genLabels, teamData[i], genDataOne.createRow()))
+  var qatacomparedata = new AddTable();
+  let qatalabels = ["Match", "Position", "Scout", "Climb QATA", "Link QATA", "QATA"];
+  qatacomparedata.addHeader(qatalabels);
+
+  for(let i = 0; i < teamData.length; i++){
+    var row = document.createElement("tr");
+    var name = qatacomparedata.getTableBody();
+    name.appendChild(row);
+    qatacomparedata.addCells(qatalabels, teamData[i], row);
   }
-  document.getElementById("1-dataContainer").appendChild(genDataOne.table);
-
-  //t2
-  var genDataTwo = new AddTable();
-  genDataTwo.addHeader(genLabels);
-
-  //pull match
-  for(let i = 0; i<teamDataTwo.length; i++){
-    genDataTwo.getTableBody().appendChild(genDataTwo.addCells(genLabels, teamData[i], genDataTwo.createRow()))
-  }
-  document.getElementById("2-dataContainer").appendChild(genDataTwo.table);
-
-  //qata things
-  //t1
-  var qataOne = new AddTable()
-  let qataLabels = ["Match", "Position", "Scout", "Climb QATA", "Link QATA", "QATA"]
-  qataOne.addHeader(qataLabels);
-  //pull match
-  for(let i = 0; i < teamDataOne.length; i++){
-    qataOne.getTableBody().appendChild(qataOne,addCells(qataLabels, teamDataOne[i], qataOne.createRow()))
-  }
-  document.getElementById("1-qataContainer").appendChild(qataOne.table);
-
-  //t2
-  let qataTwo = new AddTable()
-  qataTwo.addHeader(qataLabels);
-  //pull match
-  for(let i = 0; i < teamDataTwo.length; i++){
-    qataTwo.getTableBody().appendChild(qataOne, addCells(qataLabels, teamDataTwo[i], qataTwo.createRow()))
-  }
-  document.getElementById("2-qataContainer").appendChild(qataTwo.table);
-
-  //graphs -- do later 
+  document.getElementById("c-qataContainer").appendChild(qatacomparedata.table);
 }
-}
+
+//REAL COMPARE FUNCTION WOOOOOO
+// function compare(){
+
+// }
 //=============== RANKING ===============
 var rankHeadNames = dataStructure.createDataLabels("Rank","Team","Score",
 "Mobility",
